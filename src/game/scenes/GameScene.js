@@ -3,29 +3,51 @@ import Phaser from 'phaser';
 export default class GameScene extends Phaser.Scene {
   constructor() {
     super('GameScene');
-    this.playerHealth = 5;
-    this.maxHealth = 5;
+    this.playerHealth = 100;
+    this.maxHealth = 100;
     this.puntuacion = 0;
     this.powerUps = null;
-    this.hasDoubleShot = false;
+    this.hasMultiShot = false;
     this.enemyBullets = null;
     this.hearts = null
+    this.boss = null;
+    this.bossActive = false;
+    this.fires = null;
+    this.contFires = 0;
+    this.clocks = null;
+    this.slowTime = false;
   }
+  
+  // Nueva variable para el sistema de oleadas
+  currentWave = 0;
+  waveText;
 
   preload() {
-    this.load.image('player', 'https://labs.phaser.io/assets/sprites/player.png');
+    this.load.image('player', '/assets/player.png');
     this.load.image('bullet', '/assets/bullet.png');
-    this.load.image('enemy', 'https://labs.phaser.io/assets/sprites/player.png');
+    this.load.image('enemy', '/assets/player.png');
+    this.load.image('jugador', '/assets/jugador.png');
     this.load.image('powerup', '/assets/coin.png');
     this.load.image('heart', 'https://labs.phaser.io/assets/sprites/heart.png');
     this.load.image('enemyBullet', '/assets/bullet.png');
-
+    this.load.spritesheet('explosion', '/assets/explosion.png', {
+      frameWidth: 64, // ajusta según tu spritesheet
+      frameHeight: 64
+    });
+    this.load.image('fire', '/assets/fuego.png');
+    this.load.image('clock', '/assets/reloj.png');  
+    
+    this.load.spritesheet('bon_bon', '/assets/Pack/Pack/Enemies/Lips.png', {
+      frameWidth: 16,
+      frameHeight: 16
+    });
   }
 
 
   create() {
-    this.player = this.physics.add.sprite(250, 500, 'player');
+    this.player = this.physics.add.sprite(250, 500, 'jugador');
     this.player.setCollideWorldBounds(true);
+    this.player.setScale(0.03);
 
     this.cursors = this.input.keyboard.createCursorKeys();
     this.wasd = this.input.keyboard.addKeys({
@@ -37,15 +59,13 @@ export default class GameScene extends Phaser.Scene {
 
     this.shift = this.input.keyboard.addKey("SHIFT");
     this.input.keyboard.on('keydown-SPACE', this.shootBullet, this);
+    this.keyZ = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.Z);
     this.bullets = this.physics.add.group();
     this.enemies = this.physics.add.group();
 
-    this.time.addEvent({
-      delay: 1000,
-      callback: this.spawnEnemy,
-      callbackScope: this,
-      loop: true,
-    });
+   // Iniciar la primera oleada
+   this.startWave();
+
 
     this.physics.add.overlap(this.bullets, this.enemies, this.handleBulletEnemyCollision, null, this);
     this.physics.add.overlap(this.player, this.enemies, this.handlePlayerEnemyCollision, null, this);
@@ -58,14 +78,36 @@ export default class GameScene extends Phaser.Scene {
 
     this.hearts = this.physics.add.group();
 
+    this.fires = this.physics.add.group();
+
+    this.clocks = this.physics.add.group();
+
     this.physics.add.overlap(this.player, this.hearts, this.collectHeart, null, this);
 
     this.physics.add.overlap(this.player, this.powerUps, this.collectPowerUp, null, this);
+
+    this.physics.add.overlap(this.player, this.fires, this.collectFire, null, this);
+
+    this.physics.add.overlap(this.player, this.clocks, this.collectClock, null, this);
 
     this.enemyBullets = this.physics.add.group();
 
 // Colisión entre balas enemigas y el jugador
 this.physics.add.overlap(this.player, this.enemyBullets, this.handleEnemyBulletHit, null, this);
+
+this.anims.create({
+  key: 'explode',
+  frames: this.anims.generateFrameNumbers('explosion', { start: 0, end: 15 }), // ajusta los frames
+  frameRate: 20,
+  hideOnComplete: true // oculta el sprite al terminar
+});
+
+this.anims.create({
+  key: 'bon_bon',
+  frames: this.anims.generateFrameNumbers('bon_bon', { start: 0, end: 3 }), // N es el último frame
+  frameRate: 10,
+  repeat: -1
+});
 
   }
 
@@ -97,10 +139,46 @@ this.physics.add.overlap(this.player, this.enemyBullets, this.handleEnemyBulletH
     } else {
       this.player.setVelocityY(0);
     }
+
+    if (Phaser.Input.Keyboard.JustDown(this.keyZ)) {
+      this.specialShot();
+    }
+    
+
+    this.enemies.getChildren().forEach(enemy => {
+      const targetSpeed = this.slowTime ? 30 : 50 + this.currentWave * 10;
+      if (enemy.body.velocity.y !== targetSpeed) {
+        enemy.setVelocityY(targetSpeed);
+      }
+
+      // Verificar si el enemigo está fuera de la pantalla en la parte inferior
+      if (enemy.y > this.game.config.height) {
+        enemy.setPosition(Phaser.Math.Between(50, 450), 0);
+      }
+    });
+
+    if (this.boss && !this.boss.hasStartedMovingSideways && this.boss.y >= this.boss.stopY) {
+      this.boss.setVelocityY(0);
+      this.boss.setVelocityX(this.slowTime ? 30 : 50);
+      // comienza a moverse lateralmente
+      this.boss.hasStartedMovingSideways = true;
+    }
+    
+    
+    if (this.boss && this.boss.hasStartedMovingSideways) {
+      const speed = this.slowTime ? 30 : 50;
+    
+      if (this.boss.x <= 50 && this.boss.body.velocity.x < 0) {
+        this.boss.setVelocityX(speed); // va a la derecha
+      } else if (this.boss.x >= this.game.config.width - 50 && this.boss.body.velocity.x > 0) {
+        this.boss.setVelocityX(-speed); // va a la izquierda
+      }
+    }
+    
   }
 
   shootBullet() {
-    if (this.hasDoubleShot) {
+    if (this.hasMultiShot) {
         // Crear múltiples balas con las propiedades correctas
         const offsets = [-10, -5, 0, 5, 10]; // Posiciones relativas para las balas
         offsets.forEach(offset => {
@@ -113,64 +191,158 @@ this.physics.add.overlap(this.player, this.enemyBullets, this.handleEnemyBulletH
         const bullet = this.bullets.create(this.player.x, this.player.y - 20, 'bullet');
         bullet.setVelocityY(-300);
     }
-}
+  }
+
+  specialShot() {
+    if(this.contFires >= 3) {
+      console.log('Disparo especial activado');
+      
+      // Restablecer el contador
+      this.contFires = 0;
+  
+      // Destruir enemigos normales
+      this.enemies.getChildren().slice().forEach(enemy => {
+        if (enemy.shootTimer) enemy.shootTimer.remove();
+        const explosion = this.add.sprite(enemy.x, enemy.y, 'explosion');
+        explosion.play('explode');
+        enemy.destroy();
+        this.puntuacion += 100;
+        this.enemiesDefeated++;
+      });
+  
+      // También puedes hacer que dañe (o destruya) al jefe si está activo
+      if (this.boss && this.boss.active) {
+        this.boss.vida -= 20;
+        this.tweens.add({
+          targets: this.boss,
+          alpha: 0,
+          ease: 'Linear',
+          duration: 10,
+          repeat: 2,
+          yoyo: true,
+          onComplete: () => {
+            this.boss.alpha = 1;
+          }
+        });
+        if (this.boss.vida <= 0) {
+          this.handleBulletBossCollision(this.boss, null);
+        }
+      }
+  
+      this.checkWaveComplete();
+    }
+  }  
   
 
-spawnEnemy() {
-  const x = Phaser.Math.Between(50, 750);
-  const enemy = this.enemies.create(x, 0, 'enemy');
-  enemy.setVelocityY(50);
-  enemy.setAngle(180);
-  enemy.setScale(2);
-  enemy.vida = 3;
-
-  // Asignar temporizador individual de disparo
-  enemy.shootTimer = this.time.addEvent({
-    delay: Phaser.Math.Between(500, 1000),
-    callback: () => this.enemyShoot(enemy),
-    loop: true
-  });
-}
+  spawnEnemy() {
+    if (this.currentWaveEnemies >= this.waveEnemyCount) return;
+  
+    this.currentWaveEnemies++;
+  
+    const x = Phaser.Math.Between(50, 450);
+    const enemy = this.enemies.create(x, 0, 'bon_bon');
+    enemy.play('bon_bon');
+    const velocityY = 50 + this.currentWave * 10;
+    enemy.setVelocityY(velocityY);    
+    enemy.setAngle(180);
+    enemy.vida = 3;
+    enemy.setScale(2);
+    const shootDelay = this.slowTime ? 5000 : 1000;
+    enemy.shootTimer = this.time.addEvent({
+      delay: Phaser.Math.Between(500, shootDelay),
+      callback: () => this.enemyShoot(enemy),
+      loop: true
+    });
+  }
+  
 
 
   handleBulletEnemyCollision(bullet, enemy) {
     enemy.vida -= 1;
     bullet.destroy();
+
+    if (enemy.vida > 0) {
+      this.tweens.add({
+        targets: enemy,
+        alpha: 0,
+        ease: 'Linear',
+        duration: 10,
+        repeat: 2,
+        yoyo: true,
+        onComplete: () => {
+          enemy.alpha = 1;
+        }
+      });
+    }
+
+    
     if(enemy.vida <= 0) {
-    if (enemy.shootTimer) enemy.shootTimer.remove();
-enemy.destroy();
+      if (enemy.shootTimer) enemy.shootTimer.remove();
+      this.enemiesDefeated++;
+      const explosion = this.add.sprite(enemy.x, enemy.y, 'explosion');
+      explosion.play('explode');
 
-    this.puntuacion += 100;
+      enemy.destroy();
+
+      this.puntuacion += 100;
   
-    // 30% de probabilidad de soltar power-up
-    if (Phaser.Math.FloatBetween(0, 1) < 0.1) {
-      const powerUp = this.powerUps.create(enemy.x, enemy.y, 'powerup');
-      powerUp.setVelocityY(100);
+      // 30% de probabilidad de soltar power-up
+      if (Phaser.Math.FloatBetween(0, 1) < 0.1) {
+        const powerUp = this.powerUps.create(enemy.x, enemy.y, 'powerup');
+        powerUp.setScale(0.1);
+        powerUp.setVelocityY(100);
+      }
+
+      if (Phaser.Math.FloatBetween(0, 1) < 0.07) {
+        const heart = this.hearts.create(enemy.x, enemy.y, 'heart').setScale(0.25);
+        heart.setVelocityY(100);
+      }
+      
+      if (Phaser.Math.FloatBetween(0, 1) < 0.05) {
+        const fire = this.fires.create(enemy.x, enemy.y, 'fire').setScale(0.25);
+        fire.setVelocityY(100);
+      }
+
+      if (Phaser.Math.FloatBetween(0, 1) < 0.05) {
+        const clock = this.clocks.create(enemy.x, enemy.y, 'clock').setScale(0.25);
+        clock.setVelocityY(100);
+      }
     }
 
-    if (Phaser.Math.FloatBetween(0, 1) < 0.05) {
-      const heart = this.hearts.create(enemy.x, enemy.y, 'heart').setScale(0.25);
-      heart.setVelocityY(100);
-    }
-    }
+    this.checkWaveComplete();
     
 
   }
-  
+
 
   handlePlayerEnemyCollision(player, enemy) {
-    if (enemy.shootTimer) enemy.shootTimer.remove();
-enemy.destroy();
-
-    this.playerHealth -= 1;
-    console.log(`Vida: ${this.playerHealth}`);
+    this.playerHealth -= 0.1;
     this.updateHealthBar();
 
+    this.tweens.add({
+      targets: this.player,
+      alpha: 0,
+      ease: 'Linear',
+      duration: 10,
+      repeat: 2,
+      yoyo: true,
+      onComplete: () => {
+        this.player.alpha = 1;
+      }
+    });
+    
+
     if (this.playerHealth <= 0) {
-      this.scene.pause();
-      this.add.text(300, 250, 'GAME OVER', { fontSize: '32px', fill: '#fff' });
-      this.add.text(300, 50, `Puntuación: ${this.puntuacion}`, { fontSize: '32px', fill: '#fff' });
-    }
+      const explosion = this.add.sprite(this.player.x, this.player.y, 'explosion');
+      explosion.play('explode');
+    
+      explosion.on('animationcomplete', () => {
+        this.scene.pause();
+        this.add.text(150, 350, 'GAME OVER', { fontSize: '32px', fill: '#fff' });
+        this.add.text(150, 250, `Oleada: ${this.currentWave + 1}`, { fontSize: '32px', fill: '#fff' });
+        this.add.text(150, 200, `Puntuación: ${this.puntuacion}`, { fontSize: '32px', fill: '#fff' });
+      });
+    }    
   }
 
   updateHealthBar() {
@@ -187,8 +359,14 @@ enemy.destroy();
     this.healthBar.fillStyle(0x555555);
     this.healthBar.fillRect(x, y, barWidth, barHeight);
 
-    // Barra roja de vida
-    this.healthBar.fillStyle(0xff0000);
+    // Barra de vida
+    if(percent > 0.5) {
+      this.healthBar.fillStyle(0x008000);
+    } else if(percent > 0.25) {
+      this.healthBar.fillStyle(0xffa500);
+    } else {
+      this.healthBar.fillStyle(0xff0000);
+    }
     this.healthBar.fillRect(x, y, barWidth * percent, barHeight);
 
     // Borde blanco
@@ -198,39 +376,219 @@ enemy.destroy();
 
   collectPowerUp(player, powerUp) {
     powerUp.destroy();
-    this.hasDoubleShot = true;
+    this.hasMultiShot = true;
   
     // Puedes agregar duración limitada si quieres
     this.time.delayedCall(10000, () => {
-       this.hasDoubleShot = false;
+       this.hasMultiShot = false;
     });
   }
 
   collectHeart(player, heart) {
     heart.destroy();
-    if(this.playerHealth < 5) {
-      this.playerHealth += 1;
+    if(this.playerHealth < 90) {
+      this.playerHealth += 10;
+    } else {
+      this.playerHealth = this.maxHealth;
     }
     this.updateHealthBar();
   }
+
+  collectFire(player, fire) {
+    fire.destroy();
+    this.contFires++;
+  }
+
+  collectClock(player, clock) {
+    clock.destroy();
+    this.slowTime = true;
+    this.time.delayedCall(10000, () => {
+      this.slowTime = false;
+    });
+  }
+
 
   handleEnemyBulletHit(player, bullet) {
     bullet.destroy();
     this.playerHealth -= 1;
     this.updateHealthBar();
+
+    this.tweens.add({
+      targets: this.player,
+      alpha: 0,
+      ease: 'Linear',
+      duration: 10,
+      repeat: 2,
+      yoyo: true,
+      onComplete: () => {
+        this.player.alpha = 1;
+      }
+    });
+    
   
     if (this.playerHealth <= 0) {
-      this.scene.pause();
-      this.add.text(100, 300, 'GAME OVER', { fontSize: '32px', fill: '#fff' });
-      this.add.text(100, 150, `Puntuación: ${this.puntuacion}`, { fontSize: '32px', fill: '#fff' });
-    }
+      const explosion = this.add.sprite(this.player.x, this.player.y, 'explosion');
+      explosion.play('explode');
+    
+      explosion.on('animationcomplete', () => {
+        this.scene.pause();
+        this.add.text(150, 350, 'GAME OVER', { fontSize: '32px', fill: '#fff' });
+        this.add.text(150, 250, `Oleada: ${this.currentWave + 1}`, { fontSize: '32px', fill: '#fff' });
+        this.add.text(150, 200, `Puntuación: ${this.puntuacion}`, { fontSize: '32px', fill: '#fff' });
+      });
+    }    
   }
   
   enemyShoot(enemy) {
     if (!enemy.active) return;
-  
     const bullet = this.enemyBullets.create(enemy.x, enemy.y + 20, 'enemyBullet');
-    bullet.setVelocityY(200).setVelocityX(Phaser.Math.Between(-50, 50));
+    const speedY = this.slowTime ? 60 : 200 + (this.currentWave * 10);
+    bullet.setVelocityY(speedY);
+    bullet.setVelocityX(Phaser.Math.Between(this.slowTime ? -20 : -50, this.slowTime ? 20 : 50));
   }
+
+  // Sistema de oleadas
+  startWave() {
+    this.currentWaveEnemies = 0;
+    this.enemiesDefeated = 0;
+  
+    // Calcular valores dinámicos
+    let baseEnemyCount = 10;
+    let extraEnemies = Math.max(0, (this.currentWave - 2) * 2); // desde oleada 4
+    let enemyCount = baseEnemyCount + extraEnemies;
+    this.waveEnemyCount = enemyCount;
+  
+    let spawnRate = Math.max(200, this.slowTime ? 2000 : 1000); // más rápido pero no menos de 200ms
+  
+    // Mostrar el texto de la nueva oleada
+    if (this.waveText) {
+      this.waveText.destroy();
+    }
+    this.waveText = this.add.text(350, 30, `Oleada ${this.currentWave + 1}`, {
+      fontSize: '32px',
+      fill: '#fff'
+    }).setOrigin(0.5);
+  
+    // Iniciar spawner
+    this.spawnTimer = this.time.addEvent({
+      delay: spawnRate,
+      callback: this.spawnEnemy,
+      callbackScope: this,
+      loop: true
+    });
+  }
+  
+
+  checkWaveComplete() {
+    if (this.enemiesDefeated >= this.waveEnemyCount && !this.bossActive) {
+      this.spawnBoss(); // En vez de endWave
+    }
+  }
+  
+  spawnBoss() {
+    this.bossActive = true;
+    
+    this.boss = this.physics.add.sprite(200, 0, 'enemy');
+    this.boss.setAngle(180);
+    const bossVelocityY = this.slowTime ? 25 : 50;
+    this.boss.setVelocityY(bossVelocityY);
+
+    const delay = this.slowTime ? 1000 : 400;
+
+    this.boss.stopY = 150; // posición en Y donde se detiene
+
+    this.boss.setScale(0.6);
+    this.boss.vida = 20 + (this.currentWave * 5);
+    this.bossShootTimer = this.time.addEvent({
+      delay: delay,
+      callback: () => this.bossShoot(this.boss),
+      loop: true
+    });
+  
+    // Agregar colisión con balas
+    this.physics.add.overlap(this.bullets, this.boss, this.handleBulletBossCollision, null, this);
+  
+    // Colisión con jugador
+    this.physics.add.overlap(this.player, this.boss, this.handlePlayerEnemyCollision, null, this);
+  }
+
+  bossShoot(boss) {
+    if (!boss.active) return;
+
+    const numBullets = 24; // Number of bullets in the circle
+    const speed = this.slowTime ? 60 : 200 + (this.currentWave * 2); // Bullet speed
+    const radius = 20; // Radius of the circle
+
+    for (let i = 0; i < numBullets; i++) {
+      // Calculate angle for each bullet
+      const angle = (i / numBullets) * Math.PI * 2; // Evenly spaced angles
+
+      // Calculate X and Y positions for the bullet
+      const x = boss.x + radius * Math.cos(angle);
+      const y = boss.y + radius * Math.sin(angle);
+
+      // Calculate X and Y velocities
+      const velocityX = speed * Math.cos(angle);
+      const velocityY = speed * Math.sin(angle);
+
+      // Create and fire the bullet
+      const bullet = this.enemyBullets.create(x, y, 'enemyBullet');
+      bullet.setScale(1.5);
+      bullet.setVelocityX(velocityX);
+      bullet.setVelocityY(velocityY);
+    }
+  }
+
+
+  
+  handleBulletBossCollision(boss, bullet) {
+    boss.vida -= 1;
+    bullet.destroy();
+
+    if (boss.vida > 0) {
+      this.tweens.add({
+        targets: boss,
+        alpha: 0,
+        ease: 'Linear',
+        duration: 10,
+        repeat: 2,
+        yoyo: true,
+        onComplete: () => {
+          boss.alpha = 1;
+        }
+      });
+    }
+
+    
+    if(boss.vida <= 0) {
+      if (this.bossShootTimer) this.bossShootTimer.remove();
+      this.enemiesDefeated++;
+      const explosion = this.add.sprite(boss.x, boss.y, 'explosion');
+      explosion.setScale(4);
+      explosion.play('explode');
+
+      boss.destroy();
+
+      this.puntuacion += 1000;
+  
+      this.endWave(); // Ahora sí pasamos a la siguiente oleada
+    }
+  }
+  
+  
+
+  endWave() {
+    if (this.spawnTimer) {
+      this.spawnTimer.remove();
+    }
+  
+    this.enemies.clear(true, true);
+    this.bossActive = false; // ✅ Permitir que el jefe vuelva a aparecer
+    this.boss = null;        // ✅ Limpiar la referencia también (opcional pero recomendable)
+  
+    this.currentWave++;
+    this.startWave();
+  }
+  
   
 }
