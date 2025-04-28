@@ -216,7 +216,7 @@ this.anims.create({
         const explosion = this.add.sprite(enemy.x, enemy.y, 'explosion');
         explosion.play('explode');
         enemy.destroy();
-        this.puntuacion += 100;
+        this.puntuacion += 200;
         this.enemiesDefeated++;
       });
   
@@ -319,7 +319,7 @@ this.anims.create({
       }
 
       if (Phaser.Math.FloatBetween(0, 1) < 0.3) {
-        const coin = this.coins.create(enemy.x, enemy.y, 'coin').setScale(0.1);
+        const coin = this.coins.create(enemy.x, enemy.y, 'coin').setScale(0.04);
         coin.setVelocityY(100);
       }
     }
