@@ -1,10 +1,11 @@
 import Phaser from 'phaser';
 import GameScene from './scenes/GameScene';
+import TitleScene from './scenes/TitleScene';
 
 const config = {
   type: Phaser.AUTO,
-  width: 500,
-  height: 600,
+  width: 600,
+  height: 700,
   backgroundColor: '#666',
   physics: {
     default: 'arcade',
@@ -12,7 +13,7 @@ const config = {
       debug: false,
     },
   },
-  scene: [GameScene],
+  scene: [TitleScene, GameScene], // Agrega TitleScene como la primera escena
   parent: 'phaser-container',
 };
 

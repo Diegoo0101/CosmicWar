@@ -1,0 +1,27 @@
+.user-info {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  
+  /* filepath: c:\Users\diego\Documents\VSC_Projects\CosmicWar\src\components\GoogleAuthButton.css */
+.user-photo {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    object-fit: cover; /* Asegura que la imagen se ajuste correctamente al contenedor */
+    display: block; /* Asegura que la imagen se renderice como un bloque */
+  }
+  
+  .user-name {
+    font-size: 16px;
+    color: #fff;
+  }
+  
+  .logout-button {
+    background: none;
+    border: none;
+    color: #fff;
+    font-size: 16px;
+    cursor: pointer;
+  }

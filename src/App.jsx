@@ -1,32 +1,55 @@
-import { useEffect } from 'react';
-import Phaser from 'phaser';
-import config from './game/config';
+import { BrowserRouter as Router, Routes, Route, Link } from 'react-router-dom';
+import PhaserGame from './components/PhaserGame'; // Importa el nuevo componente
 import './App.css';
+import GoogleAuthButton from './components/GoogleAuthButton';
+import ComoJugar from './pages/ComoJugar'; // Importa la nueva página
+import ClasificacionModal from './components/ClasificacionModal';
+import TiendaModal from './components/TiendaModal';
+import PersonalizacionModal from './components/PersonalizacionModal';
+import { useState } from 'react'; // Asegúrate de importar useState
+
 
 function App() {
-  useEffect(() => {
-    const game = new Phaser.Game(config);
-    return () => {
-      game.destroy(true);
-    };
-  }, []);
+  const [isLeaderboardOpen, setIsLeaderboardOpen] = useState(false);
+  const [isShopOpen, setIsShopOpen] = useState(false);
+  const [isPersonalizationOpen, setIsPersonalizationOpen] = useState(false);
 
   return (
-    <div className="app-container">
-      <nav className="navbar">
-        <div className="navbar-title">CosmicWar</div>
-        <ul className="navbar-links">
-          <li><a href="#">Cómo jugar</a></li>
-          <li><a href="#">Tienda</a></li>
-          <li><a href="#">Personalización</a></li>
-          <li><a href="#">Tabla de clasificación</a></li>
-        </ul>
-      </nav>
-      <main className="main-content">
-        <div id="phaser-container" />
-      </main>
-    </div>
+    <Router>
+      <div className="app-container">
+        <nav className="navbar">
+        <Link to="/" className="navbar-title">CosmicWar</Link>
+          <ul className="navbar-links">
+            <li><Link to="/como-jugar" className="link-button">Cómo jugar</Link></li>
+            <li><button onClick={() => setIsShopOpen(true)} className="link-button">Tienda</button></li>
+            <li><button onClick={() => setIsPersonalizationOpen(true)} className="link-button">Personalización</button></li>
+            <li><button onClick={() => setIsLeaderboardOpen(true)} className="link-button">Tabla de clasificación</button></li>
+            <li><GoogleAuthButton/></li>
+          </ul>
+        </nav>
+        <main className="main-content">
+          <Routes>
+            <Route path="/" element={<PhaserGame />} />
+            <Route path="/como-jugar" element={<ComoJugar />} />
+          </Routes>
+        </main>
+        <footer className="footer">
+  <Link to="/" className="footer-title">CosmicWar</Link>
+  <ul className="footer-links">
+    <li><Link to="/como-jugar" className="link-button">Cómo jugar</Link></li>
+    <li><button onClick={() => setIsShopOpen(true)} className="link-button">Tienda</button></li>
+    <li><button onClick={() => setIsPersonalizationOpen(true)} className="link-button">Personalización</button></li>
+    <li><button onClick={() => setIsLeaderboardOpen(true)} className="link-button">Tabla de clasificación</button></li>
+  </ul>
+</footer>
+
+        <TiendaModal isOpen={isShopOpen} onClose={() => setIsShopOpen(false)} />
+        <PersonalizacionModal isOpen={isPersonalizationOpen} onClose={() => setIsPersonalizationOpen(false)} />
+        <ClasificacionModal isOpen={isLeaderboardOpen} onClose={() => setIsLeaderboardOpen(false)} />
+      </div>
+    </Router>
   );
 }
 
 export default App;
+

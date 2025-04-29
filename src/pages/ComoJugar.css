@@ -1,0 +1,42 @@
+.como-jugar-layout {
+    display: flex;
+    width: 100%;
+    padding: 40px 0;
+    box-sizing: border-box;
+  }
+  
+  .column {
+    flex: 1;
+    padding: 0 10px;
+  }
+  
+  .column-center {
+    flex: 2;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+  
+  .como-jugar-content {
+    max-width: 600px;
+    text-align: left;
+  }
+  
+  .comenzar-btn {
+    display: inline-block;
+    margin-top: 30px;
+    padding: 12px 24px;
+    font-size: 1.1rem;
+    background-color: #292929;
+    color: white;
+    border-radius: 8px;
+    text-decoration: none;
+    text-align: center;
+    transition: background 0.3s ease;
+  }
+  
+  .comenzar-btn:hover {
+    background-color: black;
+  }
+  
+  

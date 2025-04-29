@@ -1,4 +1,8 @@
 import Phaser from 'phaser';
+import { getFirestore, doc, setDoc, getDoc } from 'firebase/firestore';
+import { auth } from '../../firebase/config'; // Asegúrate de importar la configuración de Firebase
+
+const db = getFirestore();
 
 export default class GameScene extends Phaser.Scene {
   constructor() {
@@ -44,7 +48,7 @@ export default class GameScene extends Phaser.Scene {
 
 
   create() {
-    this.player = this.physics.add.sprite(250, 500, 'player');
+    this.player = this.physics.add.sprite(300, 600, 'player');
     this.player.setCollideWorldBounds(true);
     this.player.setScale(0.05);
 
@@ -109,6 +113,9 @@ this.anims.create({
   hideOnComplete: true // oculta el sprite al terminar
 });
 
+    this.bossShootCooldown = 0;
+
+
   }
 
   update(time) {
@@ -160,8 +167,15 @@ this.anims.create({
 
       // Verificar si el enemigo está fuera de la pantalla en la parte inferior
       if (enemy.y > this.game.config.height) {
-        enemy.setPosition(Phaser.Math.Between(50, 450), 0);
+        enemy.setPosition(Phaser.Math.Between(50, 550), 0);
       }
+
+       // 🟢 Disparo controlado por cooldown
+  const shootDelay = this.slowTime ? 1500 : 800;
+  if (time > enemy.shootCooldown) {
+    this.enemyShoot(enemy);
+    enemy.shootCooldown = time + shootDelay + Phaser.Math.Between(-200, 200);
+  }
     });
 
     if (this.boss && !this.boss.hasStartedMovingSideways && this.boss.y >= this.boss.stopY) {
@@ -182,9 +196,15 @@ this.anims.create({
       }
     }
 
-    if(this.slowTime) {
-      console.log('fondo blanco y negro');
+    if (this.boss && this.boss.active) {
+      const delay = this.slowTime ? 1500 : 500;
+    
+      if (time > this.bossShootCooldown) {
+        this.bossShoot(this.boss);
+        this.bossShootCooldown = time + delay;
+      }
     }
+    
     
   }
 
@@ -251,25 +271,20 @@ this.anims.create({
   
     this.currentWaveEnemies++;
   
-    const x = Phaser.Math.Between(50, 450);
+    const x = Phaser.Math.Between(50, 550);
     const enemy = this.enemies.create(x, 0, 'enemy');
     const velocityY = 50 + this.currentWave * 10;
-    enemy.setVelocityY(velocityY);    
+    enemy.setVelocityY(velocityY);
+    enemy.shootCooldown = 0;
     enemy.vida = 3;
     enemy.setScale(2);
-    const shootDelay = this.slowTime ? Phaser.Math.Between(1200, 2000) : Phaser.Math.Between(600, 1200);
-    enemy.shootTimer = this.time.addEvent({
-      delay: shootDelay,
-      callback: () => this.enemyShoot(enemy),
-      loop: true
-    });
   }
   
 
 
   handleBulletEnemyCollision(bullet, enemy) {
     enemy.vida -= 1;
-    bullet.destroy();
+    if (bullet) bullet.destroy();
 
     if (enemy.vida > 0) {
       this.tweens.add({
@@ -287,7 +302,6 @@ this.anims.create({
 
     
     if(enemy.vida <= 0) {
-      if (enemy.shootTimer) enemy.shootTimer.remove();
       this.enemiesDefeated++;
       const explosion = this.add.sprite(enemy.x, enemy.y, 'explosion');
       explosion.play('explode');
@@ -355,6 +369,47 @@ this.anims.create({
     this.add.text(150, 200, `Puntuación: ${this.puntuacion}`, { fontSize: '32px', fill: '#fff' });
     this.add.text(150, 250, `Monedas: ${this.contCoins}`, { fontSize: '32px', fill: '#fff' });
     this.add.text(150, 350, 'GAME OVER', { fontSize: '32px', fill: '#fff' });
+
+    // Verificar si hay un usuario autenticado
+  const user = auth.currentUser;
+  if (user) {
+    const userDocRef = doc(db, 'usuarios', user.uid);
+
+    // Leer el documento actual del usuario
+    getDoc(userDocRef)
+      .then((docSnapshot) => {
+        let currentPuntuacion = 0;
+        let currentMonedas = 0;
+
+        if (docSnapshot.exists()) {
+          const data = docSnapshot.data();
+          currentPuntuacion = data.puntuacion || 0;
+          currentMonedas = data.monedas || 0;
+        }
+
+        // Actualizar sólo si la puntuación es mayor
+        const newPuntuacion = this.puntuacion > currentPuntuacion ? this.puntuacion : currentPuntuacion;
+
+        // Sumar las monedas actuales con las nuevas
+        const newMonedas = currentMonedas + this.contCoins;
+
+        // Guardar los valores actualizados en Firestore
+        return setDoc(
+          userDocRef,
+          {
+            puntuacion: newPuntuacion,
+            monedas: newMonedas,
+          },
+          { merge: true } // Asegura que no se sobrescriban otros campos
+        );
+      })
+      .then(() => {
+        console.log('Puntuación y monedas actualizadas en Firestore');
+      })
+      .catch((error) => {
+        console.error('Error al guardar en Firestore:', error);
+      });
+  }
   }
 
   updateHealthBar() {
@@ -435,6 +490,9 @@ this.anims.create({
     fire.destroy();
     this.puntuacion += 100;
     this.contFires++;
+    if(this.contFires >= 3) {
+      this.contFires = 3;
+    }
     this.updateSpecialBar();
   }
 
@@ -523,22 +581,15 @@ this.anims.create({
   spawnBoss() {
     this.bossActive = true;
     
-    this.boss = this.physics.add.sprite(200, 0, 'boss');
+    this.boss = this.physics.add.sprite(300, 0, 'boss');
     this.boss.setAngle(180);
     const bossVelocityY = this.slowTime ? 25 : 50;
     this.boss.setVelocityY(bossVelocityY);
-
-    const delay = this.slowTime ? Phaser.Math.Between(1200, 2000) : Phaser.Math.Between(400, 600);
 
     this.boss.stopY = 150; // posición en Y donde se detiene
 
     this.boss.setScale(0.6);
     this.boss.vida = 20 + (this.currentWave * 5);
-    this.bossShootTimer = this.time.addEvent({
-      delay: delay,
-      callback: () => this.bossShoot(this.boss),
-      loop: true
-    });
   
     // Agregar colisión con balas
     this.physics.add.overlap(this.bullets, this.boss, this.handleBulletBossCollision, null, this);
@@ -578,7 +629,7 @@ this.anims.create({
   
   handleBulletBossCollision(boss, bullet) {
     boss.vida -= 1;
-    bullet.destroy();
+    if (bullet) bullet.destroy();
 
     if (boss.vida > 0) {
       this.tweens.add({
@@ -596,7 +647,6 @@ this.anims.create({
 
     
     if(boss.vida <= 0) {
-      if (this.bossShootTimer) this.bossShootTimer.remove();
       this.enemiesDefeated++;
       const explosion = this.add.sprite(boss.x, boss.y, 'explosion');
       explosion.setScale(4);
