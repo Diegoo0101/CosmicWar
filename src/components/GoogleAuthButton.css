@@ -1,27 +1,42 @@
 .user-info {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-  }
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
   
-  /* filepath: c:\Users\diego\Documents\VSC_Projects\CosmicWar\src\components\GoogleAuthButton.css */
 .user-photo {
-    width: 40px;
-    height: 40px;
-    border-radius: 50%;
-    object-fit: cover; /* Asegura que la imagen se ajuste correctamente al contenedor */
-    display: block; /* Asegura que la imagen se renderice como un bloque */
-  }
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  object-fit: cover;
+  display: block;
+}
   
-  .user-name {
-    font-size: 16px;
-    color: #fff;
-  }
+.user-name {
+  font-size: 16px;
+  color: #fff;
+}
+
+.googleBtn {
+  background-color: #ffffff;
+  border: 1px solid #d1d1d1;
+  padding: 10px 20px;
+  border-radius: 15px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.1);
+  margin-top: 10px;
+  color:black !important;
+}
   
-  .logout-button {
-    background: none;
-    border: none;
-    color: #fff;
-    font-size: 16px;
-    cursor: pointer;
-  }
+.logout-button {
+  background: none;
+  border: none;
+  color: #fff;
+  font-size: 16px;
+  cursor: pointer;
+}

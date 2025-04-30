@@ -1,4 +1,3 @@
-// src/components/LeaderboardModal.jsx
 import React, { useEffect, useState } from 'react';
 import { getFirestore, collection, query, orderBy, limit, getDocs, doc, getDoc } from 'firebase/firestore';
 import { auth } from '../firebase/config';
@@ -11,10 +10,12 @@ const ClasificacionModal = ({ isOpen, onClose }) => {
   const [currentUserScore, setCurrentUserScore] = useState(null);
 
   useEffect(() => {
-    if (!isOpen) return; // Solo carga datos si el modal está abierto
+    // Solo carga datos si el modal está abierto
+    if (!isOpen) return;
 
     const fetchLeaderboard = async () => {
       try {
+        // Obtiene los 10 jugadores con mayor puntuación
         const leaderboardQuery = query(
           collection(db, 'usuarios'),
           orderBy('puntuacion'),
@@ -36,6 +37,8 @@ const ClasificacionModal = ({ isOpen, onClose }) => {
           if (userDoc.exists()) {
             setCurrentUserScore(userDoc.data().puntuacion || 0);
           }
+        } else {
+          setCurrentUserScore(null);
         }
       } catch (error) {
         console.error('Error al cargar tabla de clasificación:', error);
@@ -45,7 +48,7 @@ const ClasificacionModal = ({ isOpen, onClose }) => {
     fetchLeaderboard();
   }, [isOpen]);
 
-  if (!isOpen) return null; // Si no está abierto, no renderizar nada
+  if (!isOpen) return null;
 
   return (
     <div className="modal-overlay">

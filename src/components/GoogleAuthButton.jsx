@@ -4,7 +4,8 @@ import { auth } from '../firebase/config';
 import { getFirestore, doc, setDoc } from 'firebase/firestore';
 import './GoogleAuthButton.css';
 
-const db = getFirestore(); // Inicializa Firestore
+// Incializa Firestore
+const db = getFirestore();
 
 const GoogleAuthButton = () => {
   const [user, setUser] = useState(null);
@@ -15,7 +16,7 @@ const GoogleAuthButton = () => {
       setUser(currentUser);
     });
 
-    return () => unsubscribe(); // Limpiar el listener al desmontar el componente
+    return () => unsubscribe();
   }, []);
 
   const handleLogin = async () => {
@@ -54,13 +55,14 @@ const GoogleAuthButton = () => {
         <button onClick={handleLogout} className="logout-button">X</button>
       </div>
     );
+  } else {
+    return (
+      <button onClick={handleLogin} className="googleBtn">
+        <img src="https://upload.wikimedia.org/wikipedia/commons/c/c1/Google_%22G%22_logo.svg" alt="Google Logo" />
+        Iniciar sesión con Google
+      </button>
+    );
   }
-
-  return (
-    <button onClick={handleLogin}>
-      Iniciar sesión con Google
-    </button>
-  );
 };
 
 export default GoogleAuthButton;

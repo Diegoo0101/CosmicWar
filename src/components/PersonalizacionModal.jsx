@@ -14,7 +14,7 @@ const PersonalizacionModal = ({ isOpen, onClose }) => {
           X
         </button>
         {user ? (
-          <p>Bienvenido a la personalización. Aquí puedes comprar personalizar las apariencias del juego.</p>
+          <p>Bienvenido a la personalización. Aquí puedes personalizar las apariencias del juego.</p>
         ) : (
           <p>Debes iniciar sesión para acceder a la personalzación.</p>
         )}

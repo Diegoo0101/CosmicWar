@@ -1,12 +1,12 @@
 import { BrowserRouter as Router, Routes, Route, Link } from 'react-router-dom';
-import PhaserGame from './components/PhaserGame'; // Importa el nuevo componente
+import PhaserGame from './components/PhaserGame';
 import './App.css';
 import GoogleAuthButton from './components/GoogleAuthButton';
-import ComoJugar from './pages/ComoJugar'; // Importa la nueva página
+import ComoJugar from './pages/ComoJugar';
 import ClasificacionModal from './components/ClasificacionModal';
 import TiendaModal from './components/TiendaModal';
 import PersonalizacionModal from './components/PersonalizacionModal';
-import { useState } from 'react'; // Asegúrate de importar useState
+import { useState } from 'react';
 
 
 function App() {
@@ -52,4 +52,3 @@ function App() {
 }
 
 export default App;
-

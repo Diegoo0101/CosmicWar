@@ -2,7 +2,7 @@ body, html, #root {
   margin: 0;
   padding: 0;
   height: 100%;
-  width: 100%; /* Asegurar que ocupe todo el ancho */
+  width: 100%;
   min-height: 100vh;
   overflow-x: hidden;
 }
@@ -11,7 +11,7 @@ body, html, #root {
   display: flex;
   flex-direction: column;
   min-height: 100vh;
-  overflow: hidden; /* Evitar desbordamientos */
+  overflow: hidden;
 }
 
 .navbar {
@@ -73,11 +73,11 @@ body, html, #root {
 }
 
 #phaser-container {
-  border: 5px solid #0E131F; /* Color y grosor del borde */
-  border-radius: 40px; /* Esquinas redondeadas */
-  padding: 15px; /* Espaciado interno opcional */
-  background-color: #0E131F; /* Fondo opcional para el marco */
-  display: inline-block; /* Asegura que el tamaño del contenedor se ajuste al contenido */
+  border: 5px solid #0E131F;
+  border-radius: 40px;
+  padding: 15px;
+  background-color: #0E131F;
+  display: inline-block;
   margin-top: 2%;
   margin-bottom: 2%;
 }
@@ -87,9 +87,8 @@ body, html, #root {
   color: white;
   display: flex;
   justify-content: space-between;
-  align-items: flex-start; /* para que empiece desde arriba */
-  border-top: 2px solid #333;
-  min-height: 200px; /* hace el footer más alto visualmente */
+  align-items: flex-start;
+  min-height: 200px;
 }
 
 .footer-title {

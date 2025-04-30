@@ -1,7 +1,6 @@
-// src/components/PhaserGame.jsx
 import { useEffect } from 'react';
 import Phaser from 'phaser';
-import config from '../game/config'; // Ajusta la ruta si es necesario
+import config from '../game/config';
 
 function PhaserGame() {
   useEffect(() => {

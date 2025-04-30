@@ -5,8 +5,13 @@ import './ComoJugar.css';
 const ComoJugar = () => {
   return (
     <div className="como-jugar-layout">
-      <div className="column column-left"></div>
+      {/* Columna izquierda */}
+      <div className="column column-left">
+        <div className="inner-column inner-column-thin"></div>
+        <div className="inner-column inner-column-thick"></div>
+      </div>
 
+      {/* Columna central */}
       <div className="column column-center">
         <div className="como-jugar-content">
           <h1>Cómo jugar</h1>
@@ -26,11 +31,15 @@ const ComoJugar = () => {
           <p><img src="#"/>: Te cura una porción de la vida</p>
           <p><img src="#"/>: Llena un tercio de la barra de poder especial. Al tenerla llena podrás hacer un disparo especial que causa daño masivo a todos los enemigos en pantalla.</p>
           <p><img src="#"/>: La velocidad de los enemigos se reduce considerablemente</p>
-          <Link to="/" className="comenzar-btn">Volver</Link>
+          <Link to="/" className="volver-btn">Volver</Link>
         </div>
       </div>
 
-      <div className="column column-right"></div>
+      {/* Columna derecha */}
+      <div className="column column-right">
+        <div className="inner-column inner-column-thick"></div>
+        <div className="inner-column inner-column-thin"></div>
+      </div>
     </div>
   );
 };

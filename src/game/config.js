@@ -5,7 +5,7 @@ import TitleScene from './scenes/TitleScene';
 const config = {
   type: Phaser.AUTO,
   width: 600,
-  height: 700,
+  height: 650,
   backgroundColor: '#666',
   physics: {
     default: 'arcade',
@@ -13,7 +13,7 @@ const config = {
       debug: false,
     },
   },
-  scene: [TitleScene, GameScene], // Agrega TitleScene como la primera escena
+  scene: [TitleScene, GameScene],
   parent: 'phaser-container',
 };
 
