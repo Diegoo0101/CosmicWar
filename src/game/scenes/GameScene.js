@@ -8,25 +8,45 @@ const db = getFirestore();
 export default class GameScene extends Phaser.Scene {
   constructor() {
     super('GameScene');
+    // Vida del jugador
     this.playerHealth = 100;
+    // Vida máxima del jugador
     this.maxHealth = 100;
+    // Puntuación
     this.puntuacion = 0;
+    // Objetos de multidisparo
     this.powerUps = null;
+    // Determina si el jugador puede hacer multidisparo
     this.hasMultiShot = false;
+    // Objetos de corazones
     this.hearts = null
+    // Objetos para llenar la barra de poder especial
     this.fires = null;
+    // Cuenta cuanto poder especial tiene el jugador. Si tiene 3, puede hacer el disparo especial
     this.contFires = 0;
+    // Objetos de relojes
     this.clocks = null;
+    // Determina si el tiempo se ralentiza por efecto de haber recolectado un reloj
     this.slowTime = false;
+    // Objetos de monedas
     this.coins = null;
+    // Cuenta cuantas monedas ha recolectado el jugador
     this.contCoins = 0;
+    // Balas enemigas
     this.enemyBullets = null;
+    // Jefe
     this.boss = null;
+    // Determina si el jefe puede aparecer (solo lo hace al eliminar a todos los enemigos)
     this.bossActive = false;
+    // Determina si el jugador está muerto
     this.isPlayerDead = false;
+    // Cuenta la oleada actual
     this.currentWave = 0;
+    // Texto que muestra al usuario en qué oleada está
     this.waveText = null;
+    // Determina si se aplica un filtro de blanco y negro
     this.grayscaleApplied = false;
+    // Cosméticos seleccionados mediante la personalización
     this.background = 'default_background.png';
     this.playerSkin = 'default_player.png';
     this.enemySkin = 'default_enemy.png';
@@ -61,6 +81,7 @@ export default class GameScene extends Phaser.Scene {
         console.error('Error al recoger datos de Firestore:', error);
       });
     }
+    
     this.load.image('background', `/assets/background/${this.background}`);
     this.load.image('player', `/assets/player/${this.playerSkin}`);
     this.load.image('bullet', '/assets/bullet.png');
@@ -84,7 +105,7 @@ export default class GameScene extends Phaser.Scene {
     this.renderer.pipelines.addPostPipeline('GrayscalePipeline', GrayscalePipeline);
     // Background
     this.add.image(300, 325, 'background');
-    // Personaje
+    // Jugador
     this.player = this.physics.add.sprite(300, 550, 'player');
     this.player.setCollideWorldBounds(true);
     this.player.setScale(0.05);
@@ -114,7 +135,7 @@ export default class GameScene extends Phaser.Scene {
     // Enemigos
     this.enemies = this.physics.add.group();
     //Colisiona bala con enemigo
-    this.physics.add.overlap(this.bullets, this.enemies, this.handleBulletEnemyCollision, null, this);
+    this.physics.add.overlap(this.enemies, this.bullets, this.handleBulletEnemyCollision, null, this);
     //Colisiona el personaje con enemigo
     this.physics.add.overlap(this.player, this.enemies, this.handlePlayerEnemyCollision, null, this);
 
@@ -234,6 +255,16 @@ export default class GameScene extends Phaser.Scene {
       if (enemy.y > this.game.config.height) {
         this.playerHealth -= 3;
         this.updateHealthBar();
+        if (this.playerHealth === 0 && !this.isPlayerDead) {
+          // Jugador muere y explota
+          this.isPlayerDead = true;
+          this.player.visible = false;
+          const explosion = this.add.sprite(this.player.x, this.player.y, 'explosion');
+          explosion.play('explode');
+          explosion.on('animationcomplete', () => {
+            this.gameOver();
+          });
+        }   
         enemy.setPosition(Phaser.Math.Between(50, 550), 0);
       }
 
@@ -347,7 +378,7 @@ export default class GameScene extends Phaser.Scene {
         if (enemy.shootTimer) enemy.shootTimer.remove();
         enemy.vida -= 19;
         this.puntuacion += 100;
-        this.handleBulletEnemyCollision();
+        this.handleBulletEnemyCollision(enemy, null);
       });
   
       // Quita 20 puntos de vida al jefe
@@ -394,7 +425,7 @@ export default class GameScene extends Phaser.Scene {
   }
 
   // Maneja colisión entre bala y enemigo
-  handleBulletEnemyCollision(bullet, enemy) {
+  handleBulletEnemyCollision(enemy, bullet) {
     enemy.vida -= 1;
     if (bullet) bullet.destroy();
 
