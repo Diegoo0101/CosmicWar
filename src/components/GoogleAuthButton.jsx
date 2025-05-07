@@ -1,24 +1,43 @@
 import React, { useState, useEffect } from 'react';
 import { GoogleAuthProvider, signInWithPopup, signOut, onAuthStateChanged } from 'firebase/auth';
 import { auth } from '../firebase/config';
-import { getFirestore, doc, setDoc, getDoc } from 'firebase/firestore';
+import { getFirestore, doc, setDoc, getDoc, deleteDoc, collection, query, where, getDocs, writeBatch, onSnapshot } from 'firebase/firestore';
 import './GoogleAuthButton.css';
-
-// Incializa Firestore
+  
 const db = getFirestore();
-
+  
 const GoogleAuthButton = () => {
   const [user, setUser] = useState(null);
-
+  const [userData, setUserData] = useState(null);
+  const [menuVisible, setMenuVisible] = useState(false);
+  
   useEffect(() => {
-    // Escuchar cambios en el estado de autenticación
-    const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
+    let unsubscribeUserData = null;
+  
+    const unsubscribeAuth = onAuthStateChanged(auth, async (currentUser) => {
       setUser(currentUser);
+      if (currentUser) {
+        const userDocRef = doc(db, 'usuarios', currentUser.uid);
+  
+        unsubscribeUserData = onSnapshot(userDocRef, (docSnap) => {
+          if (docSnap.exists()) {
+            setUserData(docSnap.data());
+          }
+        });
+      } else {
+        setUserData(null);
+        if (unsubscribeUserData) {
+          unsubscribeUserData();
+        }
+      }
     });
-
-    return () => unsubscribe();
+  
+    return () => {
+      unsubscribeAuth();
+      if (unsubscribeUserData) unsubscribeUserData();
+    };
   }, []);
-
+  
   const handleLogin = async () => {
     const provider = new GoogleAuthProvider();
     try {
@@ -79,7 +98,7 @@ const GoogleAuthButton = () => {
       console.error('Error al iniciar sesión:', error);
     }
   }
-
+  
   const handleLogout = async () => {
     try {
       await signOut(auth);
@@ -89,12 +108,59 @@ const GoogleAuthButton = () => {
       console.error('Error al cerrar sesión:', error);
     }
   };
+  
+  const handleDeleteUser = async () => {
+    if (user) {
+      try {
+        const userDocRef = doc(db, 'usuarios', user.uid);
+  
+        // Eliminar todas las adquisiciones asociadas al usuario
+        const adquisicionesQuery = query(
+          collection(db, 'adquisiciones'),
+          where('usuario', '==', user.uid)
+        );
+        const adquisicionesSnapshot = await getDocs(adquisicionesQuery);
+  
+        const batch = writeBatch(db); // Usar un batch para eliminar múltiples documentos
+        adquisicionesSnapshot.forEach((doc) => {
+          batch.delete(doc.ref);
+        });
+        await batch.commit();
+  
+        console.log('Adquisiciones del usuario eliminadas');
+  
+        // Eliminar el documento del usuario
+        await deleteDoc(userDocRef);
+        console.log('Usuario eliminado de la colección');
+  
+        handleLogout(); // Cierra la sesión después de eliminar el usuario
+      } catch (error) {
+        console.error('Error al eliminar el usuario y sus adquisiciones:', error);
+      }
+    }
+  };
 
   if (user) {
     return (
       <div className="user-info">
-        <img src={user.photoURL} alt="Foto de perfil" className="user-photo" referrerPolicy="no-referrer" />
-        <span className="user-name">{user.displayName}</span>
+        <div
+          className="user-header"
+          onClick={() => setMenuVisible(!menuVisible)} // Alterna la visibilidad del menú
+        >
+          <img src={user.photoURL} alt="Foto de perfil" className="user-photo" referrerPolicy="no-referrer" />
+          <span className="user-name">{user.displayName}</span>
+        </div>
+        {menuVisible && (
+          <div className="user-menu">
+            <img src={user.photoURL} alt="Foto de perfil" className="user-photo-large" referrerPolicy="no-referrer" />
+            <p className="user-name-large">{user.displayName}</p>
+            <p className="user-coins">Monedas: {userData?.monedas || 0}</p>
+            <p className="user-score">Puntuación: {userData?.puntuacion || 0}</p>
+            <button className="delete-button" onClick={handleDeleteUser}>
+              Eliminar usuario
+            </button>
+          </div>
+        )}
         <button onClick={handleLogout} className="logout-button">X</button>
       </div>
     );
@@ -107,5 +173,5 @@ const GoogleAuthButton = () => {
     );
   }
 };
-
+  
 export default GoogleAuthButton;
