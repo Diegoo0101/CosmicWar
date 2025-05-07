@@ -2,7 +2,6 @@ import Phaser from 'phaser';
 import { getFirestore, doc, setDoc, getDoc } from 'firebase/firestore';
 import { auth } from '../../firebase/config';
 import GrayscalePipeline from '../GrayscalePipeline';
-import WebFont from 'webfontloader';
 
 const db = getFirestore();
 
@@ -47,19 +46,6 @@ export default class GameScene extends Phaser.Scene {
     this.waveText = null;
     // Determina si se aplica un filtro de blanco y negro
     this.grayscaleApplied = false;
-  }
-
-  preload() {
-    this.fontsReady = false;
-  
-    WebFont.load({
-      google: {
-        families: ['Press Start 2P']
-      },
-      active: () => {
-        this.fontsReady = true;
-      }
-    });
   }
 
   create() {

@@ -1,6 +1,7 @@
 import Phaser from 'phaser';
 import { getFirestore, doc, getDoc } from 'firebase/firestore';
 import { auth } from '../../firebase/config';
+import WebFont from 'webfontloader';
 
 export default class LoadingScene extends Phaser.Scene {
   constructor() {
@@ -49,6 +50,13 @@ export default class LoadingScene extends Phaser.Scene {
     this.load.spritesheet('explosion', '/assets/explosion.png', {
       frameWidth: 64,
       frameHeight: 64,
+    });
+
+    this.fontsReady = false;
+    WebFont.load({
+      google: {
+        families: ['Press Start 2P']
+      }
     });
   
     // Espera a que todos los recursos se carguen antes de iniciar la siguiente escena
