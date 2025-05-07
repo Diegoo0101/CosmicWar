@@ -2,6 +2,7 @@ import Phaser from 'phaser';
 import { getFirestore, doc, setDoc, getDoc } from 'firebase/firestore';
 import { auth } from '../../firebase/config';
 import GrayscalePipeline from '../GrayscalePipeline';
+import WebFont from 'webfontloader';
 
 const db = getFirestore();
 
@@ -46,6 +47,19 @@ export default class GameScene extends Phaser.Scene {
     this.waveText = null;
     // Determina si se aplica un filtro de blanco y negro
     this.grayscaleApplied = false;
+  }
+
+  preload() {
+    this.fontsReady = false;
+  
+    WebFont.load({
+      google: {
+        families: ['Press Start 2P']
+      },
+      active: () => {
+        this.fontsReady = true;
+      }
+    });
   }
 
   create() {
@@ -283,22 +297,16 @@ export default class GameScene extends Phaser.Scene {
       this.grayscaleApplied = true;
     }
     // Se quita el filtro si ya no se ralentiza el tiempo
-    if (!this.slowTime && this.grayscaleApplied) {
+    if (!this.slowTime && this.grayscaleApplied && !this.isPlayerDead) {
       this.cameras.main.resetPostPipeline();
       this.grayscaleApplied = false;
     }
-    // Filtro de blanco y negro si se muere
-    if (this.isPlayerDead) {
-      this.cameras.main.setPostPipeline('GrayscalePipeline');
-      this.grayscaleApplied = true;
-    }
-    
-
   }
 
   // Hace que el jugador dispare
   shootBullet() {
     // Si tiene multidisparo
+    if(this.isPlayerDead) return;
     if (this.hasMultiShot) {
       const offsets = [-10, -5, 0, 5, 10]; // Posiciones para las balas
       offsets.forEach(offset => {
@@ -332,6 +340,7 @@ export default class GameScene extends Phaser.Scene {
       // Quita 20 puntos de vida al jefe
       if (this.boss && this.boss.active) {
         this.boss.vida -= 20;
+        this.updateBossHealthBar();
         this.tweens.add({
           targets: this.boss,
           alpha: 0,
@@ -452,13 +461,21 @@ export default class GameScene extends Phaser.Scene {
 
   // Fin de la partida tras muerte del jugador
   gameOver() {
+    if (this.spawnTimer) {
+      this.spawnTimer.remove();
+      this.spawnTimer = null; // Limpia la referencia
+    }
+    this.cameras.main.setPostPipeline('GrayscalePipeline');
+    this.grayscaleApplied = true;
     this.waveText.destroy();
-    this.scene.pause();
-    this.add.text(150, 150, `Oleada: ${this.currentWave + 1}`, { fontSize: '32px', fill: '#fff' });
-    this.add.text(150, 200, `Puntuación: ${this.puntuacion}`, { fontSize: '32px', fill: '#fff' });
-    this.add.text(150, 250, `Monedas: ${this.contCoins}`, { fontSize: '32px', fill: '#fff' });
-    this.add.text(150, 350, 'GAME OVER', { fontSize: '32px', fill: '#fff' });
+    this.physics.pause();
 
+    this.time.delayedCall(100, () => {
+      this.add.text(150, 150, `Oleada: ${this.currentWave + 1}`, { fontFamily: '"Press Start 2P"', fontSize: '24px', fill: '#fff', stroke: '#000000', strokeThickness: 4 });
+      this.add.text(150, 200, `Puntuación: ${this.puntuacion}`, { fontFamily: '"Press Start 2P"', fontSize: '24px', fill: '#fff', stroke: '#000000', strokeThickness: 4 });
+      this.add.text(150, 250, `Monedas: ${this.contCoins}`, { fontFamily: '"Press Start 2P"', fontSize: '24px', fill: '#fff', stroke: '#000000', strokeThickness: 4 });
+      this.add.text(150, 350, 'GAME OVER', { fontFamily: '"Press Start 2P"', fontSize: '24px', fill: '#fff' });
+    });
     // Verifica si el usuario ha iniciado sesión
     const user = auth.currentUser;
     if (user) {
@@ -493,7 +510,51 @@ export default class GameScene extends Phaser.Scene {
         console.error('Error al guardar en Firestore:', error);
       });
     }
+
+    // Habilitar reinicio tras 2 segundos
+    this.time.delayedCall(2000, () => {
+    this.add.text(110, 400, 'Presiona cualquier tecla', { fontFamily: '"Press Start 2P"', fontSize: '16px', fill: '#fff', stroke: '#000000', strokeThickness: 4 });
+    this.add.text(130, 440, 'para volver al título.', { fontFamily: '"Press Start 2P"', fontSize: '16px', fill: '#fff', stroke: '#000000', strokeThickness: 4 });
+
+    // Detectar cualquier tecla para reiniciar el juego
+    this.input.keyboard.once('keydown', () => {
+      this.resetGame();
+      this.scene.start('TitleScene');
+    });
+  });
+}
+
+// Método para reiniciar valores críticos
+resetGame() {
+  this.playerHealth = 100;
+  this.isPlayerDead = false;
+  this.contFires = 0;
+  this.contCoins = 0;
+  this.puntuacion = 0;
+  this.currentWave = 0;
+  this.bossActive = false;
+  this.grayscaleApplied = false;
+
+  // Limpia grupos de enemigos, balas, etc.
+  this.enemies.clear(true, true);
+  this.bullets.clear(true, true);
+  this.enemyBullets.clear(true, true);
+  this.powerUps.clear(true, true);
+  this.hearts.clear(true, true);
+  this.fires.clear(true, true);
+  this.clocks.clear(true, true);
+  this.coins.clear(true, true);
+
+  // Reinicia las barras de vida y poder especial
+  this.updateHealthBar();
+  this.updateSpecialBar();
+
+  // Elimina el jefe si está activo
+  if (this.boss) {
+    this.boss.destroy();
+    this.boss = null;
   }
+}
 
   // Actualiza gráfico de la barra de vida
   updateHealthBar() {
@@ -511,10 +572,6 @@ export default class GameScene extends Phaser.Scene {
     const percent = this.playerHealth / this.maxHealth;
 
     this.healthBar.clear();
-
-    // Fondo gris
-    this.healthBar.fillStyle(0x555555);
-    this.healthBar.fillRect(x, y, barWidth, barHeight);
 
     // Barra de vida
     if(percent > 0.5) {
@@ -542,9 +599,6 @@ export default class GameScene extends Phaser.Scene {
 
     this.specialBar.clear();
 
-    // Fondo gris
-    this.specialBar.fillStyle(0x555555);
-    this.specialBar.fillRect(x, y, barWidth, barHeight);
     // Barra de poder especial
     this.specialBar.fillStyle(0xffff00);
     this.specialBar.fillRect(x, y, barWidth * percent, barHeight);
@@ -620,7 +674,7 @@ export default class GameScene extends Phaser.Scene {
   
   // Hace que los enemigos disparen
   enemyShoot(enemy) {
-    if (!enemy.active) return;
+    if (!enemy.active || this.isPlayerDead) return;
     const bullet = this.enemyBullets.create(enemy.x, enemy.y + 20, 'bullet');
     const speedY = this.slowTime ? 60 : 200 + (this.currentWave * 10);
     const speedX = Phaser.Math.Between(this.slowTime ? -20 : -50, this.slowTime ? 20 : 50);
@@ -648,8 +702,11 @@ export default class GameScene extends Phaser.Scene {
       this.waveText.destroy();
     }
     this.waveText = this.add.text(350, 30, `Oleada ${this.currentWave + 1}`, {
-      fontSize: '32px',
-      fill: '#fff'
+      fontFamily: '"Press Start 2P"',
+      fontSize: '24px',
+      fill: '#fff',
+      stroke: '#000000',
+      strokeThickness: 4
     }).setOrigin(0.5);
   
     // Iniciar spawner
@@ -668,7 +725,6 @@ export default class GameScene extends Phaser.Scene {
       this.spawnBoss();
     }
   }
-  
   // Spawnea al jefe
   spawnBoss() {
     this.bossActive = true;
@@ -676,9 +732,15 @@ export default class GameScene extends Phaser.Scene {
     const bossVelocityY = this.slowTime ? 25 : 50 + (this.currentWave * 5);
     this.boss.setScale(0.6);
     this.boss.vida = 20 + (this.currentWave * 5);
+    this.boss.maxVida = this.boss.vida;
     this.boss.setVelocityY(bossVelocityY);
     // Posición vertical en la que se detiene
     this.boss.stopY = 150;
+
+    // Barra de vida del jefe
+    this.bossHealthBar = this.add.graphics();
+    this.bossHealthBar.setVisible = true;
+    this.updateBossHealthBar();
   
     // Colisión con balas
     this.physics.add.overlap(this.bullets, this.boss, this.handleBulletBossCollision, null, this);
@@ -688,7 +750,7 @@ export default class GameScene extends Phaser.Scene {
 
   // Maneja disparos del jefe
   bossShoot(boss) {
-    if (!boss.active) return;
+    if (!boss.active || this.isPlayerDead) return;
     const numBullets = 24;
     const speed = this.slowTime ? 60 : 200 + (this.currentWave * 2);
     const radius = 24;
@@ -713,11 +775,12 @@ export default class GameScene extends Phaser.Scene {
     }
   }
 
-
   // Maneja colisiones de balas con el jefe
   handleBulletBossCollision(boss, bullet) {
     boss.vida -= 1;
     if (bullet) bullet.destroy();
+    this.updateBossHealthBar();
+
     if (boss.vida > 0) {
       // El jefe parpadea, indicando que recibe daño
       this.tweens.add({
@@ -740,14 +803,40 @@ export default class GameScene extends Phaser.Scene {
       boss.destroy();
       this.itemDrop(boss);
       this.puntuacion += 1000;
+      this.bossHealthBar.setVisible = false;
+      this.bossHealthBar.destroy();
 
       // Termina la oleada
       this.endWave();
     }
   }
-  
-  
 
+  // Actualiza barra de vida del jefe
+  updateBossHealthBar() {
+    const barWidth = 550;
+    const barHeight = 10;
+    const x = 25;
+    const y = 600;
+    if(this.boss.vida > this.boss.maxVida) {
+      this.boss.vida = 100;
+    }
+    if(this.boss.vida < 0) {
+      this.boss.vida = 0;
+    }
+
+    const percent = this.boss.vida / this.boss.maxVida;
+
+    this.bossHealthBar.clear();
+
+    // Barra de vida
+    this.bossHealthBar.fillStyle(0xff0000);
+    this.bossHealthBar.fillRect(x, y, barWidth * percent, barHeight);
+
+    // Borde blanco
+    this.bossHealthBar.lineStyle(2, 0xffffff);
+    this.bossHealthBar.strokeRect(x, y, barWidth, barHeight);
+  }
+  
   endWave() {
     // Se elimina el spawner
     if (this.spawnTimer) {
