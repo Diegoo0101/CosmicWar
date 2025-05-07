@@ -6,25 +6,19 @@ export default class TitleScene extends Phaser.Scene {
   }
 
   preload() {
-    // Carga cualquier recurso necesario para la pantalla de título
-    this.load.image('titlebackground', '/assets/titlescreen_background.png'); // Fondo opcional
-    this.load.image('playButton', '/assets/play_button.png'); // Botón de jugar
+    this.load.image('titlebackground', '/assets/titlescreen_background.png');
+    this.load.image('playButton', '/assets/play_button.png');
     this.load.image('title', '/assets/titlescreen_title.png');
   }
 
-  create() {
-    // Agregar fondo (opcional)
+  async create() {
     this.add.image(300, 325, 'titlebackground');
-
-    this.add.image(300, 200, 'title')
-
-    // Agregar botón de jugar
+    this.add.image(300, 200, 'title');
+  
     const playButton = this.add.image(300, 550, 'playButton').setInteractive();
-    playButton;
-
-    // Evento al hacer clic en el botón
+    playButton.setInteractive();
     playButton.on('pointerdown', () => {
-      this.scene.start('GameScene'); // Inicia la escena del juego
+      this.scene.start('LoadingScene');
     });
   }
 }

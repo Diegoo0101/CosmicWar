@@ -46,59 +46,7 @@ export default class GameScene extends Phaser.Scene {
     this.waveText = null;
     // Determina si se aplica un filtro de blanco y negro
     this.grayscaleApplied = false;
-    // Cosméticos seleccionados mediante la personalización
-    this.background = 'default_background.png';
-    this.playerSkin = 'default_player.png';
-    this.enemySkin = 'default_enemy.png';
-    this.bossSkin = 'default_boss.png';
   }
-
-  preload() {
-    const user = auth.currentUser;
-    if (user) {
-      const userDocRef = doc(db, 'usuarios', user.uid);
-      getDoc(userDocRef).then((docSnapshot) => {
-        if (docSnapshot.exists()) {
-          const data = docSnapshot.data();
-          this.background = data.background_seleccionado || 'default_background.png';
-          this.playerSkin = data.playerSkin_seleccionado || 'default_player.png';
-          this.enemySkin = data.enemySkin_seleccionado || 'default_enemy.png';
-          this.bossSkin = data.bossSkin_seleccionado || 'default_boss.png';
-        }
-        return setDoc(
-          userDocRef,
-          {
-            background_seleccionado: this.background,
-            playerSkin_seleccionado: this.playerSkin,
-            enemySkin_seleccionado: this.enemySkin,
-            bossSkin_seleccionado: this.bossSkin,
-          },
-          { merge: true }
-        );
-      }).then(() => {
-        console.log('Datos de personalización obtenidos');
-      }).catch((error) => {
-        console.error('Error al recoger datos de Firestore:', error);
-      });
-    }
-    
-    this.load.image('background', `/assets/background/${this.background}`);
-    this.load.image('player', `/assets/player/${this.playerSkin}`);
-    this.load.image('bullet', '/assets/bullet.png');
-    this.load.image('enemy', `/assets/enemy/${this.enemySkin}`);
-    this.load.image('boss', `/assets/enemy/${this.bossSkin}`);
-    this.load.image('item_multishot', '/assets/item_multishot.png');
-    this.load.image('item_specialshot', '/assets/item_specialshot.png');
-    this.load.image('item_stoptime', '/assets/item_stoptime.png'); 
-    this.load.image('item_health', 'https://labs.phaser.io/assets/sprites/heart.png');
-    this.load.image('coin', '/assets/coin.png');
-
-    this.load.spritesheet('explosion', '/assets/explosion.png', {
-      frameWidth: 64,
-      frameHeight: 64
-    }); 
-  }
-
 
   create() {
     // Pipeline blanco y negro
@@ -421,7 +369,7 @@ export default class GameScene extends Phaser.Scene {
     enemy.setVelocityY(velocityY);
     enemy.shootCooldown = 0;
     enemy.vida = 3;
-    enemy.setScale(2);
+    enemy.setScale(0.4);
   }
 
   // Maneja colisión entre bala y enemigo
@@ -725,8 +673,7 @@ export default class GameScene extends Phaser.Scene {
   spawnBoss() {
     this.bossActive = true;
     this.boss = this.physics.add.sprite(300, 0, 'boss');
-    this.boss.setAngle(180);
-    const bossVelocityY = this.slowTime ? 25 : 50;
+    const bossVelocityY = this.slowTime ? 25 : 50 + (this.currentWave * 5);
     this.boss.setScale(0.6);
     this.boss.vida = 20 + (this.currentWave * 5);
     this.boss.setVelocityY(bossVelocityY);
@@ -814,6 +761,4 @@ export default class GameScene extends Phaser.Scene {
     this.currentWave++;
     this.startWave();
   }
-  
-  
 }

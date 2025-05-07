@@ -17,8 +17,7 @@
   padding: 2rem;
   position: relative;
   border-radius: 10px;
-  width: 400px;
-  max-width: 90%;
+  max-width: 50%;
 }
   
 .close-button {
