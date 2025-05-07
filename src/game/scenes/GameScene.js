@@ -57,6 +57,7 @@ export default class GameScene extends Phaser.Scene {
     this.player = this.physics.add.sprite(300, 550, 'player');
     this.player.setCollideWorldBounds(true);
     this.player.setScale(0.05);
+    this.player.setDepth(10);
 
     // Controles
     this.cursors = this.input.keyboard.createCursorKeys();
@@ -499,8 +500,8 @@ export default class GameScene extends Phaser.Scene {
 
     // Habilitar reinicio tras 2 segundos
     this.time.delayedCall(2000, () => {
-    this.add.text(110, 400, 'Presiona cualquier tecla', { fontFamily: '"Press Start 2P"', fontSize: '16px', fill: '#fff', stroke: '#000000', strokeThickness: 4 });
-    this.add.text(130, 440, 'para volver al título.', { fontFamily: '"Press Start 2P"', fontSize: '16px', fill: '#fff', stroke: '#000000', strokeThickness: 4 });
+    this.add.text(this.scale.width/2, 460, 'Presiona cualquier tecla', { fontFamily: '"Press Start 2P"', fontSize: '16px', fill: '#fff', stroke: '#000000', strokeThickness: 4 }).setOrigin(0.5);
+    this.add.text(this.scale.width/2, 500, 'para volver al título.', { fontFamily: '"Press Start 2P"', fontSize: '16px', fill: '#fff', stroke: '#000000', strokeThickness: 4 }).setOrigin(0.5);
 
     // Detectar cualquier tecla para reiniciar el juego
     this.input.keyboard.once('keydown', () => {
@@ -687,7 +688,7 @@ resetGame() {
     if (this.waveText) {
       this.waveText.destroy();
     }
-    this.waveText = this.add.text(350, 30, `Oleada ${this.currentWave + 1}`, {
+    this.waveText = this.add.text(this.scale.width/2 + 30, 45, `Oleada ${this.currentWave + 1}`, {
       fontFamily: '"Press Start 2P"',
       fontSize: '24px',
       fill: '#fff',

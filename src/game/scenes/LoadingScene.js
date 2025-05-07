@@ -9,7 +9,7 @@ export default class LoadingScene extends Phaser.Scene {
   }
 
   async preload() {
-    this.add.text(200, 300, 'Cargando...', { fontSize: '24px', fill: '#fff' });
+    this.add.text(this.scale.width/2, 300, 'Cargando...', { fontSize: '24px', fill: '#fff' }).setOrigin(0.5);;
   
     try {
       const usuarioCargado = auth.currentUser;
