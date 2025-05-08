@@ -20,7 +20,7 @@ function App() {
         <nav className="navbar">
         <Link to="/" className="navbar-title">CosmicWar</Link>
           <ul className="navbar-links">
-            <li><Link to="/como-jugar" className="link-button">Cómo jugar</Link></li>
+            <li><a href="/como-jugar" className="link-button">Cómo jugar</a></li>
             <li><button onClick={() => setIsShopOpen(true)} className="link-button">Tienda</button></li>
             <li><button onClick={() => setIsPersonalizationOpen(true)} className="link-button">Personalización</button></li>
             <li><button onClick={() => setIsLeaderboardOpen(true)} className="link-button">Tabla de clasificación</button></li>
@@ -36,7 +36,7 @@ function App() {
         <footer className="footer">
   <Link to="/" className="footer-title">CosmicWar</Link>
   <ul className="footer-links">
-    <li><Link to="/como-jugar" className="link-button">Cómo jugar</Link></li>
+    <li><a href="/como-jugar" className="link-button">Cómo jugar</a></li>
     <li><button onClick={() => setIsShopOpen(true)} className="link-button">Tienda</button></li>
     <li><button onClick={() => setIsPersonalizationOpen(true)} className="link-button">Personalización</button></li>
     <li><button onClick={() => setIsLeaderboardOpen(true)} className="link-button">Tabla de clasificación</button></li>

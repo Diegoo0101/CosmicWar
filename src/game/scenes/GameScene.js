@@ -371,6 +371,9 @@ export default class GameScene extends Phaser.Scene {
   // Maneja colisión entre bala y enemigo
   handleBulletEnemyCollision(enemy, bullet) {
     enemy.vida -= 1;
+    if(this.bossActive) {
+      enemy.vida -= 3;
+    }
     if (bullet) bullet.destroy();
 
     if (enemy.vida > 0) {
@@ -431,7 +434,7 @@ export default class GameScene extends Phaser.Scene {
   // Maneja la colisión entre el jugador y el enemigo
   handlePlayerEnemyCollision(player, enemy) {
     if (this.isPlayerDead) return;
-    this.playerHealth -= 0.1;
+    this.playerHealth -= 0.1 * (this.currentWave + 1);
     this.updateHealthBar();
 
     if (this.playerHealth === 0 && !this.isPlayerDead) {
@@ -637,14 +640,22 @@ resetGame() {
   collectCoin(player, coin) {
     coin.destroy();
     this.puntuacion += 7;
-    this.contCoins += 1 + this.currentWave;
+    if(!this.slowTime) {
+      this.contCoins += 1 + this.currentWave;
+    } else {
+      this.contCoins += 5 + this.currentWave;
+    }
+
   }
 
   // Bala enemiga impacta con jugador
   handleEnemyBulletHit(player, bullet) {
     bullet.destroy();
     if (this.isPlayerDead) return;
-    this.playerHealth -= 1;
+    this.playerHealth -= 1 + (0.3 * this.currentWave);
+    if (this.bossActive) {
+      this.playerHealth -= 1;
+    }
     this.updateHealthBar();
 
     // Si el jugador muere
@@ -724,7 +735,14 @@ resetGame() {
     // Posición vertical en la que se detiene
     this.boss.stopY = 150;
 
-    // Barra de vida del jefe
+    // Barra de vida del jefe y nombre
+    this.jefeText = this.add.text(this.scale.width/2, 585, 'Jefe Alienígena', {
+      fontFamily: '"Press Start 2P"',
+      fontSize: '12px',
+      fill: '#fff',
+      stroke: '#000000',
+      strokeThickness: 1
+    }).setOrigin(0.5);
     this.bossHealthBar = this.add.graphics();
     this.bossHealthBar.setVisible = true;
     this.updateBossHealthBar();
@@ -790,6 +808,8 @@ resetGame() {
       boss.destroy();
       this.itemDrop(boss);
       this.puntuacion += 1000;
+      this.jefeText.setVisible = false;
+      this.jefeText.destroy();
       this.bossHealthBar.setVisible = false;
       this.bossHealthBar.destroy();
 
@@ -800,7 +820,7 @@ resetGame() {
 
   // Actualiza barra de vida del jefe
   updateBossHealthBar() {
-    const barWidth = 550;
+    const barWidth = this.scale.width - 50;
     const barHeight = 10;
     const x = 25;
     const y = 600;
