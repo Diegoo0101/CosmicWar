@@ -1,8 +1,7 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { GoogleAuthProvider, signInWithPopup, signOut, onAuthStateChanged } from 'firebase/auth';
 import { auth } from '../firebase/config';
 import { getFirestore, doc, setDoc, getDoc, deleteDoc, collection, query, where, getDocs, writeBatch, onSnapshot } from 'firebase/firestore';
-import './GoogleAuthButton.css';
   
 const db = getFirestore();
   
@@ -15,6 +14,7 @@ const GoogleAuthButton = () => {
     let unsubscribeUserData = null;
   
     const unsubscribeAuth = onAuthStateChanged(auth, async (currentUser) => {
+      // Comprueba si el usuario está autenticado
       setUser(currentUser);
       if (currentUser) {
         const userDocRef = doc(db, 'usuarios', currentUser.uid);
@@ -38,6 +38,7 @@ const GoogleAuthButton = () => {
     };
   }, []);
   
+  // Maneja el login
   const handleLogin = async () => {
     const provider = new GoogleAuthProvider();
     try {
@@ -59,7 +60,7 @@ const GoogleAuthButton = () => {
           puntuacion: 0
         });
 
-        // Añade adquisiciones predeterminadas solo en la primera vez
+        // Añade adquisiciones predeterminadas si el usuario es nuevo
         const jugadorSnap = await getDoc(doc(db, 'cosmeticos', 'jugador_default'));
         if (jugadorSnap.exists()) {
           await setDoc(doc(db, 'adquisiciones', `${user.uid}_defaultJugador`), {
@@ -68,7 +69,6 @@ const GoogleAuthButton = () => {
             fecha: new Date().toISOString(),
           });
         }
-
         const enemigoSnap = await getDoc(doc(db, 'cosmeticos', 'enemigo_default'));
         if (enemigoSnap.exists()) {
           await setDoc(doc(db, 'adquisiciones', `${user.uid}_defaultEnemigo`), {
@@ -77,7 +77,6 @@ const GoogleAuthButton = () => {
             fecha: new Date().toISOString(),
           });
         }
-
         const fondoSnap = await getDoc(doc(db, 'cosmeticos', 'fondo_default'));
         if (fondoSnap.exists()) {
           await setDoc(doc(db, 'adquisiciones', `${user.uid}_defaultFondo`), {
@@ -86,10 +85,6 @@ const GoogleAuthButton = () => {
             fecha: new Date().toISOString(),
           });
         }
-
-        console.log('Nuevo usuario creado en Firestore con valores predeterminados');
-      } else {
-        console.log('Usuario ya existente. No se sobreescriben valores predeterminados');
       }
 
       window.location.reload();
@@ -99,16 +94,17 @@ const GoogleAuthButton = () => {
     }
   }
   
+  // Maneja el logout
   const handleLogout = async () => {
     try {
       await signOut(auth);
-      console.log('Sesión cerrada');
       window.location.reload();
     } catch (error) {
       console.error('Error al cerrar sesión:', error);
     }
   };
   
+  // Maneja la eliminación del usuario
   const handleDeleteUser = async () => {
     if (user) {
       try {
@@ -121,19 +117,16 @@ const GoogleAuthButton = () => {
         );
         const adquisicionesSnapshot = await getDocs(adquisicionesQuery);
   
-        const batch = writeBatch(db); // Usar un batch para eliminar múltiples documentos
+        const batch = writeBatch(db);
         adquisicionesSnapshot.forEach((doc) => {
           batch.delete(doc.ref);
         });
         await batch.commit();
   
-        console.log('Adquisiciones del usuario eliminadas');
-  
-        // Eliminar el documento del usuario
+        // Eliminar el usuario
         await deleteDoc(userDocRef);
-        console.log('Usuario eliminado de la colección');
-  
-        handleLogout(); // Cierra la sesión después de eliminar el usuario
+        // Cierra sesión
+        handleLogout();
       } catch (error) {
         console.error('Error al eliminar el usuario y sus adquisiciones:', error);
       }
@@ -145,7 +138,7 @@ const GoogleAuthButton = () => {
       <div className="user-info">
         <div
           className="user-header"
-          onClick={() => setMenuVisible(!menuVisible)} // Alterna la visibilidad del menú
+          onClick={() => setMenuVisible(!menuVisible)}
         >
           <img src={user.photoURL} alt="Foto de perfil" className="user-photo" referrerPolicy="no-referrer" />
           <span className="user-name">{user.displayName}</span>

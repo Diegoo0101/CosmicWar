@@ -56,7 +56,7 @@ export default class GameScene extends Phaser.Scene {
     // Jugador
     this.player = this.physics.add.sprite(300, 550, 'player');
     this.player.setCollideWorldBounds(true);
-    this.player.setScale(0.05);
+    this.player.setScale(0.7);
     this.player.setDepth(10);
 
     // Controles
@@ -181,9 +181,9 @@ export default class GameScene extends Phaser.Scene {
     if (Phaser.Input.Keyboard.JustDown(this.keyZ)) {
       this.specialShot();
     }
-
-    // Elimina las balas del jugador que se salen del mapa
+    // Balas del jugador en pantalla
     this.bullets.getChildren().forEach(bullet => {
+      // Elimina las balas del jugador que se salen del mapa
       if (bullet.y < 0) {
         bullet.setActive(false).setVisible(false);
         bullet.body.stop();
@@ -191,8 +191,8 @@ export default class GameScene extends Phaser.Scene {
         return;
       }
     })
-    
 
+    // Enemigos en pantalla
     this.enemies.getChildren().forEach(enemy => {
       // Refresca la velocidad de los enemigos si el tiempo está ralentizado o no
       const targetSpeed = this.slowTime ? 30 : 50 + this.currentWave * 10;
@@ -225,10 +225,11 @@ export default class GameScene extends Phaser.Scene {
     }
     });
 
+    // Balas enemigas en pantalla
     this.enemyBullets.getChildren().forEach(bullet => {
       if (!bullet.active) return;
     
-      // Desactiva si sale de pantalla
+      // Desactiva si la bala enemiga se sale de pantalla
       if (bullet.y > this.game.config.height || bullet.y < 0 || bullet.x > this.game.config.width || bullet.x < 0) {
         bullet.setActive(false).setVisible(false);
         bullet.body.stop();
@@ -402,6 +403,7 @@ export default class GameScene extends Phaser.Scene {
     this.checkWaveComplete();
   }
 
+  // Maneja el drop de objetos al eliminar un enemigo
   itemDrop(enemy) {
     // 10% de probabilidad de soltar item de multidisparo
     if (Phaser.Math.FloatBetween(0, 1) < 0.1) {
@@ -453,7 +455,7 @@ export default class GameScene extends Phaser.Scene {
   gameOver() {
     if (this.spawnTimer) {
       this.spawnTimer.remove();
-      this.spawnTimer = null; // Limpia la referencia
+      this.spawnTimer = null;
     }
     this.cameras.main.setPostPipeline('GrayscalePipeline');
     this.grayscaleApplied = true;
@@ -494,8 +496,6 @@ export default class GameScene extends Phaser.Scene {
           },
           { merge: true }
         );
-      }).then(() => {
-        console.log('Puntuación y monedas actualizadas en Firestore');
       }).catch((error) => {
         console.error('Error al guardar en Firestore:', error);
       });
@@ -689,11 +689,11 @@ resetGame() {
   
     // Cantidad de enemigos por oleada
     let baseEnemyCount = 10;
-    let extraEnemies = Math.max(0, (this.currentWave - 2) * 2); // Se van añadiendo enemigos extra a partir de la la oleada 4
+    let extraEnemies = Math.max(0, (this.currentWave - 2) * 2);
     let enemyCount = baseEnemyCount + extraEnemies;
     this.waveEnemyCount = enemyCount;
   
-    let spawnRate = Math.max(200, this.slowTime ? 2000 : 1000); // Maneja la velocidad de spawneo
+    let spawnRate = Math.max(200, this.slowTime ? 2000 : 1000);
   
     // Mostrar el texto de la nueva oleada
     if (this.waveText) {

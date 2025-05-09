@@ -1,7 +1,7 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { auth } from '../firebase/config';
 import { getFirestore, collection, getDocs, doc, setDoc, query, where, getDoc } from 'firebase/firestore';
-import './TiendaModal.css';
+
 
 const TiendaModal = ({ isOpen, onClose }) => {
   const db = getFirestore();
@@ -119,8 +119,6 @@ const TiendaModal = ({ isOpen, onClose }) => {
       // Actualiza el estado local
       setCoinCont(nuevasMonedas);
       setAdquisiciones([...adquisiciones, item.nombre]);
-  
-      console.log(`Cosmético "${item.nombre}" comprado con éxito. Monedas restantes: ${nuevasMonedas}`);
     } catch (error) {
       console.error('Error al realizar la compra:', error);
     }
@@ -132,7 +130,7 @@ const TiendaModal = ({ isOpen, onClose }) => {
         <button className="close-button" onClick={onClose}>X</button>
         {user ? (
           <>
-            <div className="current-user-score">
+            <div className="current-user-coins">
               Monedas: {coinCont}
             </div>
             <h2 className="modal-title">Tienda de Cosméticos</h2>

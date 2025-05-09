@@ -1,7 +1,4 @@
-import React from 'react';
 import { Link } from 'react-router-dom';
-import './ComoJugar.css';
-
 const ComoJugar = () => {
   return (
     <div className="como-jugar-layout">

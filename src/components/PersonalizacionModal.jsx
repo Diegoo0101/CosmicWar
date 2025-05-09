@@ -1,7 +1,6 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { auth } from '../firebase/config';
 import { getFirestore, collection, getDocs, query, where,  doc, updateDoc  } from 'firebase/firestore';
-import './PersonalizacionModal.css';
 
 const PersonalizacionModal = ({ isOpen, onClose }) => {
   const db = getFirestore();

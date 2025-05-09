@@ -1,8 +1,6 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { getFirestore, collection, query, orderBy, limit, getDocs, doc, getDoc } from 'firebase/firestore';
 import { auth } from '../firebase/config';
-import './ClasificacionModal.css';
-
 const db = getFirestore();
 
 const ClasificacionModal = ({ isOpen, onClose }) => {
@@ -10,7 +8,6 @@ const ClasificacionModal = ({ isOpen, onClose }) => {
   const [currentUserScore, setCurrentUserScore] = useState(null);
 
   useEffect(() => {
-    // Solo carga datos si el modal está abierto
     if (!isOpen) return;
 
     const fetchLeaderboard = async () => {
@@ -54,7 +51,7 @@ const ClasificacionModal = ({ isOpen, onClose }) => {
     <div className="modal-overlay">
       <div className="modal-content">
         <button className="close-button" onClick={onClose}>X</button>
-        <h2>Tabla de Clasificación</h2>
+        <h2 className="modal-title">Tabla de Clasificación</h2>
         <ul className="leaderboard-list">
           {topUsers.map((user, index) => (
             <li key={user.id}>

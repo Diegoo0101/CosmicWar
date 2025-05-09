@@ -2,7 +2,7 @@ import { BrowserRouter as Router, Routes, Route, Link } from 'react-router-dom';
 import PhaserGame from './components/PhaserGame';
 import './App.css';
 import GoogleAuthButton from './components/GoogleAuthButton';
-import ComoJugar from './pages/ComoJugar';
+import ComoJugar from './components/ComoJugar';
 import ClasificacionModal from './components/ClasificacionModal';
 import TiendaModal from './components/TiendaModal';
 import PersonalizacionModal from './components/PersonalizacionModal';
