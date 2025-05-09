@@ -436,7 +436,11 @@ export default class GameScene extends Phaser.Scene {
   // Maneja la colisión entre el jugador y el enemigo
   handlePlayerEnemyCollision(player, enemy) {
     if (this.isPlayerDead) return;
-    this.playerHealth -= 0.1 * (this.currentWave + 1);
+    if(this.currentWave < 5) {
+      this.playerHealth -= 0.1 * (1 + this.currentWave);
+    } else {
+      this.playerHealth -= 0.5;
+    }
     this.updateHealthBar();
 
     if (this.playerHealth === 0 && !this.isPlayerDead) {
@@ -652,9 +656,13 @@ resetGame() {
   handleEnemyBulletHit(player, bullet) {
     bullet.destroy();
     if (this.isPlayerDead) return;
-    this.playerHealth -= 1 + (0.3 * this.currentWave);
+    if(this.currentWave < 10) {
+      this.playerHealth -= 1 + (0.05 * this.currentWave);
+    } else {
+      this.playerHealth -= 1.5;
+    }
     if (this.bossActive) {
-      this.playerHealth -= 1;
+      this.playerHealth -= 0.5;
     }
     this.updateHealthBar();
 
@@ -808,6 +816,7 @@ resetGame() {
       boss.destroy();
       this.itemDrop(boss);
       this.puntuacion += 1000;
+      this.contCoins += 20 + (5 * this.currentWave);
       this.jefeText.setVisible = false;
       this.jefeText.destroy();
       this.bossHealthBar.setVisible = false;
