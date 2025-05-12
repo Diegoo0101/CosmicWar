@@ -23,7 +23,9 @@ export default class GameScene extends Phaser.Scene {
     // Objetos para llenar la barra de poder especial
     this.fires = null;
     // Cuenta cuanto poder especial tiene el jugador. Si tiene 3, puede hacer el disparo especial
-    this.contFires = 0;
+    this.contFires = 3;
+    // Se está disparando el disparo especial;
+    this.activeSpecialBullet = null;
     // Objetos de relojes
     this.clocks = null;
     // Determina si el tiempo se ralentiza por efecto de haber recolectado un reloj
@@ -81,6 +83,8 @@ export default class GameScene extends Phaser.Scene {
 
     // Balas
     this.bullets = this.physics.add.group();
+    // Bala especial
+    this.specialBullets = this.physics.add.group();
     // Enemigos
     this.enemies = this.physics.add.group();
     //Colisiona bala con enemigo
@@ -139,12 +143,12 @@ export default class GameScene extends Phaser.Scene {
     if (this.cursors.left.isDown || this.wasd.left.isDown){
       this.player.setVelocityX(-200);
       if(this.shift.isDown) {
-        this.player.setVelocityX(-400);
+        this.player.setVelocityX(-350);
       }
     } else if (this.cursors.right.isDown || this.wasd.right.isDown) {
       this.player.setVelocityX(200);
       if(this.shift.isDown) {
-        this.player.setVelocityX(400);
+        this.player.setVelocityX(350);
       }
     } else {
       this.player.setVelocityX(0);
@@ -153,12 +157,12 @@ export default class GameScene extends Phaser.Scene {
     if (this.cursors.up.isDown || this.wasd.up.isDown){
       this.player.setVelocityY(-200);
       if(this.shift.isDown) {
-        this.player.setVelocityY(-400);
+        this.player.setVelocityY(-350);
       }
     } else if (this.cursors.down.isDown || this.wasd.down.isDown) {
       this.player.setVelocityY(200);
       if(this.shift.isDown) {
-        this.player.setVelocityY(400);
+        this.player.setVelocityY(350);
       }
     } else {
       this.player.setVelocityY(0);
@@ -167,14 +171,14 @@ export default class GameScene extends Phaser.Scene {
     // Pulsar el espacio
     if (Phaser.Input.Keyboard.JustDown(this.spaceKey)) {
       this.shootBullet();
-      this.shootCooldown = time + 300;
+      this.shootCooldown = time + 200;
     }
 
     // Mantener pulsado el espacio
     if (this.spaceKey.isDown) {
       if (time > this.shootCooldown) {
         this.shootBullet();
-        this.shootCooldown = time + 300;
+        this.shootCooldown = time + 200;
       }
     }
     // Disparo especial
@@ -289,34 +293,78 @@ export default class GameScene extends Phaser.Scene {
       this.cameras.main.resetPostPipeline();
       this.grayscaleApplied = false;
     }
+
+    if (this.activeSpecialBullet && this.player) {
+      this.activeSpecialBullet.x = this.player.x;
+      this.activeSpecialBullet.y = this.player.y - (this.player.displayHeight / 2) - (this.activeSpecialBullet.displayHeight / 2);
+    }
   }
 
   // Hace que el jugador dispare
   shootBullet() {
-    // Si tiene multidisparo
     if(this.isPlayerDead) return;
     if (this.hasMultiShot) {
-      const offsets = [-10, -5, 0, 5, 10]; // Posiciones para las balas
+      // Si tiene multidisparo
+      const offsets = [-10, -5, 0, 5, 10];
+      const speedY = -300;
+      const horizontalSpreadFactor = 10;
+
       offsets.forEach(offset => {
         const bullet = this.bullets.create(this.player.x + offset, this.player.y - 20, 'bullet');
-        bullet.setVelocityY(-300);
-        bullet.setVelocityX(offset * 2); // dirección horizontal
+        const speedX = offset * horizontalSpreadFactor;
+
+        bullet.setVelocity(speedX, speedY);
+        bullet.setScale(0.02);
+        const angle = Math.atan2(speedY, speedX);
+
+        bullet.setAngle(Phaser.Math.RadToDeg(angle) + 90);
       });
-    // Si no tiene multidisparo
     } else {
-        const bullet = this.bullets.create(this.player.x, this.player.y - 20, 'bullet');
-        bullet.setVelocityY(-300);
+      // Si no tiene multidisparo
+      const bullet = this.bullets.create(this.player.x, this.player.y - 20, 'bullet');
+      bullet.setVelocityY(-300);
+      bullet.setScale(0.02);
     }
   }
 
   // Hace que el jugador haga el disparo especial
   specialShot() {
     // Comprueba que el jugador tenga suficiente poder especial
-    if(this.contFires >= 3) {
+    if (this.contFires >= 3) {
       // Vacía el poder especial
       this.contFires = 0;
       this.updateSpecialBar();
-  
+
+      // En caso de spam
+      if (this.activeSpecialBullet) {
+        this.activeSpecialBullet.destroy();
+        this.activeSpecialBullet = null;
+      }
+
+      // Sprite
+      const specialBullet = this.add.image(this.player.x, this.player.y, 'specialbullet');
+      specialBullet.setDepth(11);
+      this.activeSpecialBullet = specialBullet;
+      specialBullet.y = this.player.y - (this.player.displayHeight / 2) - (specialBullet.displayHeight / 2);
+
+      // Efecto de flash
+      const { width, height } = this.sys.game.config;
+      const flash = this.add.graphics({ fillStyle: { color: 0xffffff, alpha: 1 } });
+      flash.fillRect(0, 0, width, height);
+      flash.setDepth(999);
+      this.tweens.add({
+        targets: flash,
+        alpha: 0,
+        ease: 'Linear',
+        duration: 500,
+        onComplete: () => {
+          flash.destroy();
+        }
+      });
+
+      // Efecto de pantalla agitada
+      this.cameras.main.shake(1000, 0.01);
+
       // Destruye a todos los enemigos
       this.enemies.getChildren().slice().forEach(enemy => {
         if (enemy.shootTimer) enemy.shootTimer.remove();
@@ -324,7 +372,7 @@ export default class GameScene extends Phaser.Scene {
         this.puntuacion += 100;
         this.handleBulletEnemyCollision(enemy, null);
       });
-  
+
       // Quita 20 puntos de vida al jefe
       if (this.boss && this.boss.active) {
         this.boss.vida -= 20;
@@ -347,6 +395,13 @@ export default class GameScene extends Phaser.Scene {
           this.handleBulletBossCollision(this.boss, null);
         }
       }
+
+      this.time.delayedCall(1000, () => {
+        if (this.activeSpecialBullet) {
+          this.activeSpecialBullet.destroy();
+          this.activeSpecialBullet = null;
+        }
+      }, [], this);
 
       // Comprueba si todos los enemigos han muerto para spawnear al jefe
       this.checkWaveComplete();
@@ -407,28 +462,27 @@ export default class GameScene extends Phaser.Scene {
   itemDrop(enemy) {
     // 10% de probabilidad de soltar item de multidisparo
     if (Phaser.Math.FloatBetween(0, 1) < 0.1) {
-      const powerUp = this.powerUps.create(enemy.x, enemy.y, 'item_multishot');
-      powerUp.setScale(1.2);
+      const powerUp = this.powerUps.create(enemy.x, enemy.y, 'item_multishot').setScale(0.8);
       powerUp.setVelocityY(100);
     }
-    // 7% de probabilidad de soltar corazón
+    // 7% de probabilidad de soltar salud
     if (Phaser.Math.FloatBetween(0, 1) < 0.07) {
-      const heart = this.hearts.create(enemy.x, enemy.y, 'item_health').setScale(0.25);
-      heart.setVelocityY(100);
+      const health = this.hearts.create(enemy.x, enemy.y, 'item_health').setScale(1.3);
+      health.setVelocityY(100);
     }
     // 5% de probabilidad de soltar item de poder especial
     if (Phaser.Math.FloatBetween(0, 1) < 0.05) {
-      const fire = this.fires.create(enemy.x, enemy.y, 'item_specialshot').setScale(0.5);
+      const fire = this.fires.create(enemy.x, enemy.y, 'item_specialshot').setScale(1);
       fire.setVelocityY(100);
     }
     // 5% de probabilidad de soltar item de reloj ralentizador
     if (Phaser.Math.FloatBetween(0, 1) < 0.05) {
-      const clock = this.clocks.create(enemy.x, enemy.y, 'item_stoptime').setScale(0.45);
+      const clock = this.clocks.create(enemy.x, enemy.y, 'item_stoptime').setScale(1);
       clock.setVelocityY(100);
     }
     // 30% de probabilidad de soltar moneda
     if (Phaser.Math.FloatBetween(0, 1) < 0.3) {
-      const coin = this.coins.create(enemy.x, enemy.y, 'coin').setScale(0.04);
+      const coin = this.coins.create(enemy.x, enemy.y, 'coin').setScale(0.25);
       coin.setVelocityY(100);
     }
   }
@@ -611,7 +665,7 @@ resetGame() {
     });
   }
 
-  // Jugador recolecta corazón
+  // Jugador recolecta salud
   collectHeart(player, heart) {
     heart.destroy();
     this.puntuacion += 5;
@@ -681,11 +735,17 @@ resetGame() {
   // Hace que los enemigos disparen
   enemyShoot(enemy) {
     if (!enemy.active || this.isPlayerDead) return;
-    const bullet = this.enemyBullets.create(enemy.x, enemy.y + 20, 'bullet');
+    const bullet = this.enemyBullets.create(enemy.x, enemy.y + 20, 'enemybullet');
     const speedY = this.slowTime ? 60 : 200 + (this.currentWave * 10);
     const speedX = Phaser.Math.Between(this.slowTime ? -20 : -50, this.slowTime ? 20 : 50);
+
     bullet.setVelocityY(speedY);
     bullet.setVelocityX(speedX);
+
+    const angle = Math.atan2(speedY, speedX);
+    bullet.setAngle(Phaser.Math.RadToDeg(angle) - 90);
+
+    bullet.setScale(0.1);
   }
 
   // Sistema de oleadas
@@ -781,10 +841,12 @@ resetGame() {
       const velocityY = speed * Math.sin(angle);
 
       // Crea las balas y las dispara
-      const bullet = this.enemyBullets.create(x, y, 'bullet');
-      bullet.setScale(1.5);
+      const bullet = this.enemyBullets.create(x, y, 'enemybullet');
+      bullet.setScale(0.15);
       bullet.setVelocityX(velocityX);
       bullet.setVelocityY(velocityY);
+      const angleSprite = Math.atan2(velocityY, velocityX);
+      bullet.setAngle(Phaser.Math.RadToDeg(angleSprite) - 90);
     }
   }
 

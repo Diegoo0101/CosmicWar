@@ -1,7 +1,6 @@
 import Phaser from 'phaser';
 import { getFirestore, doc, getDoc } from 'firebase/firestore';
 import { auth } from '../../firebase/config';
-import WebFont from 'webfontloader';
 
 export default class LoadingScene extends Phaser.Scene {
   constructor() {
@@ -39,24 +38,19 @@ export default class LoadingScene extends Phaser.Scene {
     this.load.image('background', `/assets/Fondo/${this.background}.png`);
     this.load.image('player', `/assets/Jugador/${this.playerSkin}.png`);
     this.load.image('bullet', '/assets/bullet.png');
+    this.load.image('enemybullet', '/assets/enemybullet.png');
+    this.load.image('specialbullet', '/assets/specialbullet.png');
     this.load.image('enemy', `/assets/Enemigo/${this.enemySkin}.png`);
     this.load.image('boss', `/assets/Enemigo/${this.enemySkin}_boss.png`);
     this.load.image('item_multishot', '/assets/item_multishot.png');
     this.load.image('item_specialshot', '/assets/item_specialshot.png');
     this.load.image('item_stoptime', '/assets/item_stoptime.png');
-    this.load.image('item_health', 'https://labs.phaser.io/assets/sprites/heart.png');
+    this.load.image('item_health', '/assets/health.png');
     this.load.image('coin', '/assets/coin.png');
   
     this.load.spritesheet('explosion', '/assets/explosion.png', {
       frameWidth: 64,
       frameHeight: 64,
-    });
-
-    this.fontsReady = false;
-    WebFont.load({
-      google: {
-        families: ['Press Start 2P']
-      }
     });
   
     // Espera a que todos los recursos se carguen antes de iniciar la siguiente escena

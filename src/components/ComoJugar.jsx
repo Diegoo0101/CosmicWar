@@ -25,7 +25,7 @@ const ComoJugar = () => {
           <h2>Objetos</h2>
           <p className="object_p"><img src="assets/coin.png"/>: Recolecta monedas para poder adquirir ciertos cosméticos</p>
           <p className="object_p"><img src="assets/item_multishot.png"/>: Te permite disparar una ráfaga de cinco balas</p>
-          <p className="object_p"><img src="https://labs.phaser.io/assets/sprites/heart.png"/>: Te cura una porción de la vida</p>
+          <p className="object_p"><img src="assets/health.png"/>: Te cura una porción de la vida</p>
           <p className="object_p"><img src="assets/item_specialshot.png"/>: Llena un tercio de la barra de poder especial. Al tenerla llena podrás hacer un disparo especial que causa daño masivo a todos los enemigos en pantalla.</p>
           <p className="object_p"><img src="assets/item_stoptime.png"/>: La velocidad de los enemigos se reduce considerablemente</p>
           <Link to="/" className="volver-btn">Volver</Link>

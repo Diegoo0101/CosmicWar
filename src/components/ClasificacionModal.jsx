@@ -15,7 +15,7 @@ const ClasificacionModal = ({ isOpen, onClose }) => {
         // Obtiene los 10 jugadores con mayor puntuación
         const leaderboardQuery = query(
           collection(db, 'usuarios'),
-          orderBy('puntuacion'),
+          orderBy('puntuacion', 'desc'),
           limit(10)
         );
         const querySnapshot = await getDocs(leaderboardQuery);
