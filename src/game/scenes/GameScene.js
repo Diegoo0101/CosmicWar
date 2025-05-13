@@ -472,12 +472,12 @@ export default class GameScene extends Phaser.Scene {
     }
     // 5% de probabilidad de soltar item de poder especial
     if (Phaser.Math.FloatBetween(0, 1) < 0.05) {
-      const fire = this.fires.create(enemy.x, enemy.y, 'item_specialshot').setScale(1);
+      const fire = this.fires.create(enemy.x, enemy.y, 'item_specialshot').setScale(0.75).setDepth(8);
       fire.setVelocityY(100);
     }
     // 5% de probabilidad de soltar item de reloj ralentizador
     if (Phaser.Math.FloatBetween(0, 1) < 0.05) {
-      const clock = this.clocks.create(enemy.x, enemy.y, 'item_stoptime').setScale(1);
+      const clock = this.clocks.create(enemy.x, enemy.y, 'item_stoptime').setScale(0.75);
       clock.setVelocityY(100);
     }
     // 30% de probabilidad de soltar moneda
