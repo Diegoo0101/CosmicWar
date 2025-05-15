@@ -23,7 +23,7 @@ export default class GameScene extends Phaser.Scene {
     // Objetos para llenar la barra de poder especial
     this.fires = null;
     // Cuenta cuanto poder especial tiene el jugador. Si tiene 3, puede hacer el disparo especial
-    this.contFires = 3;
+    this.contFires = 0;
     // Se está disparando el disparo especial;
     this.activeSpecialBullet = null;
     // Objetos de relojes
@@ -48,13 +48,19 @@ export default class GameScene extends Phaser.Scene {
     this.waveText = null;
     // Determina si se aplica un filtro de blanco y negro
     this.grayscaleApplied = false;
+    // Determina la música
+    this.currentMusic = null;
+    //Botón de mutear
+    this.muteButton = null;
+    // Determina si el sonido está muteado
+    this.isMuted = false;
   }
 
   create() {
     // Pipeline blanco y negro
     this.renderer.pipelines.addPostPipeline('GrayscalePipeline', GrayscalePipeline);
     // Background
-    this.add.image(300, 325, 'background');
+    this.add.image(300, 325, 'background').setOrigin(0.5);
     // Jugador
     this.player = this.physics.add.sprite(300, 550, 'player');
     this.player.setCollideWorldBounds(true);
@@ -94,10 +100,12 @@ export default class GameScene extends Phaser.Scene {
 
     // Crear barra de vida
     this.healthBar = this.add.graphics();
+    this.healthBar.setDepth(999);
     this.updateHealthBar();
     // Crear barra de poder especial
     this.specialBar = this.add.graphics();
     this.updateSpecialBar();
+    this.specialBar.setDepth(999);
 
     // Crear items de multidisparo
     this.powerUps = this.physics.add.group();
@@ -125,13 +133,41 @@ export default class GameScene extends Phaser.Scene {
     // Crea la animación de la explosión
     this.anims.create({
       key: 'explode',
-      frames: this.anims.generateFrameNumbers('explosion', { start: 0, end: 15 }), // ajusta los frames
+      frames: this.anims.generateFrameNumbers('explosion', { start: 0, end: 9 }),
       frameRate: 20,
-      hideOnComplete: true // oculta el sprite al terminar
+      hideOnComplete: true
     });
+
+    // Audio
+    this.jefeSFX = this.sound.add('jefe_aparece');
+    this.disparoSFX = this.sound.add('disparo');
+    this.disparo_jugadorSFX = this.sound.add('disparo_jugador');
+    this.impactoSFX = this.sound.add('impacto');
+    this.impacto_jugadorSFX = this.sound.add('impacto_jugador');
+    this.explosionSFX = this.sound.add('explosion');
+    this.explosion_jugadorSFX = this.sound.add('explosion_jugador');
+    this.explosion_jefeSFX = this.sound.add('explosion_jefe');
+    this.powerupSFX = this.sound.add('powerup');
+    this.monedaSFX = this.sound.add('moneda');
+    this.especialSFX = this.sound.add('especial');
+
+    this.oleada1_1 = this.sound.add('oleada1-1');
+    this.oleada1_2 = this.sound.add('oleada1-2');
+    this.oleada10 = this.sound.add('oleada10');
+    this.oleada20 = this.sound.add('oleada20');
+
 
     // Cooldown de disparos del jefe (Se actualiza según el delay)
     this.bossShootCooldown = 0;
+
+    //Botón de música
+    this.muteButton = this.add.image(this.scale.width - 40, 40, 'unmute')
+      .setInteractive()
+      .setScrollFactor(0)
+      .setScale(3)
+      .setDepth(999)
+      .setOrigin(0.5)
+      .on('pointerdown', this.toggleMute, this);
 
     // Iniciar la primera oleada
     this.startWave();
@@ -213,7 +249,9 @@ export default class GameScene extends Phaser.Scene {
           this.isPlayerDead = true;
           this.player.visible = false;
           const explosion = this.add.sprite(this.player.x, this.player.y, 'explosion');
+          explosion.setScale(0.7);
           explosion.play('explode');
+          this.explosion_jugadorSFX.play();
           explosion.on('animationcomplete', () => {
             this.gameOver();
           });
@@ -303,6 +341,7 @@ export default class GameScene extends Phaser.Scene {
   // Hace que el jugador dispare
   shootBullet() {
     if(this.isPlayerDead) return;
+    this.disparo_jugadorSFX.play();
     if (this.hasMultiShot) {
       // Si tiene multidisparo
       const offsets = [-10, -5, 0, 5, 10];
@@ -342,6 +381,7 @@ export default class GameScene extends Phaser.Scene {
       }
 
       // Sprite
+      this.especialSFX.play();
       const specialBullet = this.add.image(this.player.x, this.player.y, 'specialbullet');
       specialBullet.setDepth(11);
       this.activeSpecialBullet = specialBullet;
@@ -375,6 +415,7 @@ export default class GameScene extends Phaser.Scene {
 
       // Quita 20 puntos de vida al jefe
       if (this.boss && this.boss.active) {
+        this.impactoSFX.play();
         this.boss.vida -= 20;
         this.updateBossHealthBar();
         this.tweens.add({
@@ -433,6 +474,7 @@ export default class GameScene extends Phaser.Scene {
     if (bullet) bullet.destroy();
 
     if (enemy.vida > 0) {
+      this.impactoSFX.play();
       // Animación de parpadeo, indicando que recibe daño
       this.tweens.add({
         targets: enemy,
@@ -449,7 +491,9 @@ export default class GameScene extends Phaser.Scene {
       // Enemigo muere y explota
       this.enemiesDefeated++;
       const explosion = this.add.sprite(enemy.x, enemy.y, 'explosion');
+      explosion.setScale(0.7);
       explosion.play('explode');
+      this.explosionSFX.play();
       enemy.destroy();
       this.puntuacion += 100;
       this.itemDrop(enemy);
@@ -502,7 +546,9 @@ export default class GameScene extends Phaser.Scene {
       this.isPlayerDead = true;
       this.player.visible = false;
       const explosion = this.add.sprite(this.player.x, this.player.y, 'explosion');
+      explosion.setScale(0.7);
       explosion.play('explode');
+      this.explosion_jugadorSFX.play();
       explosion.on('animationcomplete', () => {
         this.gameOver();
       });
@@ -515,9 +561,9 @@ export default class GameScene extends Phaser.Scene {
       this.spawnTimer.remove();
       this.spawnTimer = null;
     }
+    this.currentMusic.stop();
     this.cameras.main.setPostPipeline('GrayscalePipeline');
     this.grayscaleApplied = true;
-    this.waveText.destroy();
     this.physics.pause();
 
     this.time.delayedCall(100, () => {
@@ -658,6 +704,7 @@ resetGame() {
   // Jugador recolecta item de multidisparo
   collectPowerUp(player, powerUp) {
     powerUp.destroy();
+    this.powerupSFX.play();
     this.puntuacion += 10;
     this.hasMultiShot = true;
     this.time.delayedCall(10000, () => {
@@ -668,6 +715,7 @@ resetGame() {
   // Jugador recolecta salud
   collectHeart(player, heart) {
     heart.destroy();
+    this.powerupSFX.play();
     this.puntuacion += 5;
     this.playerHealth += 10;
     this.updateHealthBar();
@@ -676,6 +724,7 @@ resetGame() {
   // Jugador recolecta item de poder especial
   collectFire(player, fire) {
     fire.destroy();
+    this.powerupSFX.play();
     this.puntuacion += 100;
     this.contFires++;
     if(this.contFires >= 3) {
@@ -687,6 +736,7 @@ resetGame() {
   // Jugador recolecta reloj ralentizador
   collectClock(player, clock) {
     clock.destroy();
+    this.powerupSFX.play();
     this.puntuacion += 75;
     this.slowTime = true;
     this.time.delayedCall(10000, () => {
@@ -697,6 +747,7 @@ resetGame() {
   // Jugador recolecta moneda
   collectCoin(player, coin) {
     coin.destroy();
+    this.monedaSFX.play();
     this.puntuacion += 7;
     if(!this.slowTime) {
       this.contCoins += 1 + this.currentWave;
@@ -709,6 +760,7 @@ resetGame() {
   // Bala enemiga impacta con jugador
   handleEnemyBulletHit(player, bullet) {
     bullet.destroy();
+    this.impacto_jugadorSFX.play();
     if (this.isPlayerDead) return;
     if(this.currentWave < 10) {
       this.playerHealth -= 1 + (0.05 * this.currentWave);
@@ -726,6 +778,7 @@ resetGame() {
       this.player.visible = false;
       const explosion = this.add.sprite(this.player.x, this.player.y, 'explosion');
       explosion.play('explode');
+      this.explosion_jugadorSFX.play();
       explosion.on('animationcomplete', () => {
         this.gameOver();
       });
@@ -735,6 +788,7 @@ resetGame() {
   // Hace que los enemigos disparen
   enemyShoot(enemy) {
     if (!enemy.active || this.isPlayerDead) return;
+    this.disparoSFX.play();
     const bullet = this.enemyBullets.create(enemy.x, enemy.y + 20, 'enemybullet');
     const speedY = this.slowTime ? 60 : 200 + (this.currentWave * 10);
     const speedX = Phaser.Math.Between(this.slowTime ? -20 : -50, this.slowTime ? 20 : 50);
@@ -754,27 +808,61 @@ resetGame() {
     this.currentWaveEnemies = 0;
     // Enemigos derrotados
     this.enemiesDefeated = 0;
-  
+
     // Cantidad de enemigos por oleada
     let baseEnemyCount = 10;
     let extraEnemies = Math.max(0, (this.currentWave - 2) * 2);
     let enemyCount = baseEnemyCount + extraEnemies;
     this.waveEnemyCount = enemyCount;
-  
+
     let spawnRate = Math.max(200, this.slowTime ? 2000 : 1000);
-  
+
     // Mostrar el texto de la nueva oleada
     if (this.waveText) {
       this.waveText.destroy();
     }
-    this.waveText = this.add.text(this.scale.width/2 + 30, 45, `Oleada ${this.currentWave + 1}`, {
-      fontFamily: '"Press Start 2P"',
-      fontSize: '24px',
-      fill: '#fff',
-      stroke: '#000000',
-      strokeThickness: 4
-    }).setOrigin(0.5);
-  
+    this.waveText = this.add.text(
+      -this.scale.width / 2,
+      this.scale.height / 2,
+      `Oleada ${this.currentWave + 1}`,
+      {
+        fontFamily: '"Press Start 2P"',
+        fontSize: '58px',
+        fill: '#fff',
+        stroke: '#000000',
+        strokeThickness: 8,
+        alpha: 0
+      }
+    ).setOrigin(0.5)
+    this.waveText.setDepth(999);
+
+    // Crear la animación
+    this.tweens.add({
+      targets: this.waveText,
+      x: this.scale.width / 2,
+      alpha: 0.7,
+      duration: 1000,
+      ease: 'Cubic.Out',
+      yoyo: false,
+      hold: 2000,
+      repeat: 0,
+      onComplete: () => {
+        this.tweens.add({
+          targets: this.waveText,
+          x: this.scale.width * 1.5,
+          alpha: 0,
+          duration: 1000,
+          ease: 'Cubic.In',
+          onComplete: () => {
+            if (this.waveText) {
+              this.waveText.destroy();
+              this.waveText = null;
+            }
+          }
+        });
+      }
+    });
+
     // Iniciar spawner
     this.spawnTimer = this.time.addEvent({
       delay: spawnRate,
@@ -782,6 +870,38 @@ resetGame() {
       callbackScope: this,
       loop: true
     });
+
+    this.setMusic();
+  }
+  setMusic() {
+    if (this.currentWave === 0) {
+      if (Phaser.Math.FloatBetween(0, 1) < 0.5) {
+        this.currentMusic = this.oleada1_1;
+      } else {
+        this.currentMusic = this.oleada1_2;
+      }
+      this.currentMusic.loop = true;
+      this.currentMusic.play();
+      this.currentMusic.setMute(this.isMuted);
+    } else if (this.currentWave === 4) {
+      this.currentMusic.stop();
+      this.currentMusic = this.oleada10;
+      this.currentMusic.play();
+      this.currentMusic.setMute(this.isMuted);
+    } else if (this.currentWave === 9) {
+      this.currentMusic.stop();
+      this.currentMusic = this.oleada20;
+      this.currentMusic.play();
+      this.currentMusic.setMute(this.isMuted);
+    }
+  }
+
+  toggleMute() {
+    this.isMuted = !this.isMuted;
+    if (this.currentMusic) {
+      this.currentMusic.setMute(this.isMuted);
+    }
+    this.muteButton.setTexture(this.isMuted ? 'mute' : 'unmute');
   }
 
   // Comprueba si se han derrotado a todos los enemigos de la oleada
@@ -793,6 +913,7 @@ resetGame() {
   }
   // Spawnea al jefe
   spawnBoss() {
+    this.jefeSFX.play();
     this.bossActive = true;
     this.boss = this.physics.add.sprite(300, 0, 'boss');
     const bossVelocityY = this.slowTime ? 25 : 50 + (this.currentWave * 5);
@@ -824,7 +945,8 @@ resetGame() {
   // Maneja disparos del jefe
   bossShoot(boss) {
     if (!boss.active || this.isPlayerDead) return;
-    const numBullets = 24;
+    this.disparoSFX.play();
+    const numBullets = 18;
     const speed = this.slowTime ? 60 : 200 + (this.currentWave * 2);
     const radius = 24;
 
@@ -857,6 +979,7 @@ resetGame() {
     this.updateBossHealthBar();
 
     if (boss.vida > 0) {
+      this.impactoSFX.play();
       // El jefe parpadea, indicando que recibe daño
       this.tweens.add({
         targets: boss,
@@ -873,7 +996,8 @@ resetGame() {
       // El jefe muere y explota
       this.enemiesDefeated++;
       const explosion = this.add.sprite(boss.x, boss.y, 'explosion');
-      explosion.setScale(4);
+      explosion.setScale(2);
+      this.explosion_jefeSFX.play();
       explosion.play('explode');
       boss.destroy();
       this.itemDrop(boss);

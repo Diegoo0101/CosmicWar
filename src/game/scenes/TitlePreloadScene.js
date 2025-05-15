@@ -8,7 +8,7 @@ export default class TitlePreloadScene extends Phaser.Scene {
 
   async preload() {
     // Cargar recursos necesarios
-    this.load.image('titlebackground', '/assets/titlescreen_background.png');
+    this.load.image('titlebackground', '/assets/Fondo/titlescreen_background.png');
     WebFont.load({
       google: {
         families: ['Press Start 2P']

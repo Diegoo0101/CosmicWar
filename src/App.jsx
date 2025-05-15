@@ -1,6 +1,7 @@
 import { BrowserRouter as Router, Routes, Route, Link } from 'react-router-dom';
-import PhaserGame from './components/PhaserGame';
 import './App.css';
+import './App_movil.css';
+import PhaserGame from './components/PhaserGame';
 import GoogleAuthButton from './components/GoogleAuthButton';
 import ComoJugar from './components/ComoJugar';
 import ClasificacionModal from './components/ClasificacionModal';

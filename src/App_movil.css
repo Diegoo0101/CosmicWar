@@ -1,0 +1,196 @@
+
+/* Media Queries for Small Screens */
+
+@media (max-width: 768px) {
+  .navbar {
+    display: flex;
+    justify-content: space-between; /* Keep space between */
+    align-items: center;
+    padding: 0.5rem; /* Reduced padding */
+    overflow-x: auto; /* Enable horizontal scroll */
+    white-space: nowrap; /* Prevent wrapping */
+    -webkit-overflow-scrolling: touch; /* Smooth scroll on iOS */
+  }
+
+  .navbar-title {
+    font-size: 1.2rem;
+    margin-right: 1rem; /* Add spacing after title */
+  }
+
+  .navbar-links {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem; /* Reduced gap */
+    margin: 0;
+    padding: 0;
+  }
+
+  .navbar-links li {
+    display: inline-block; /* Keep items in line */
+  }
+
+  .main-content {
+    padding-left: 1rem;
+    padding-right: 1rem;
+  }
+
+  #phaser-container {
+    width: 90%;
+    border-radius: 20px;
+    padding: 10px;
+    margin-top: 1rem;
+    margin-bottom: 1rem;
+  }
+
+  .footer {
+    flex-direction: column;
+    text-align: center;
+    align-items: center;
+    padding: 20px 10px 0px;
+    display: block;
+  }
+
+  .footer-title {
+    font-size: 1.2rem;
+    width: 100%;
+    margin-bottom: 10px;
+  }
+
+  .footer-links {
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    gap: 10px;
+  }
+
+  .como-jugar-layout {
+    flex-direction: column;
+  }
+
+  .column {
+    flex-direction: column;
+  }
+
+  .como-jugar-content {
+    max-width: 100%;
+  }
+
+  .volver-btn {
+    margin-top: 20px;
+    padding: 10px 20px;
+    font-size: 1rem;
+  }
+
+  .como-jugar-content img {
+    width: 24px;
+    height: 24px;
+    margin-right: 5px;
+  }
+
+  .modal-content {
+    width: 90%;
+    padding: 15px;
+  }
+
+  .close-button {
+    top: 10px;
+    right: 10px;
+    font-size: 1rem;
+  }
+
+  .modal-title {
+    font-size: 1.1rem;
+    margin-bottom: 10px;
+  }
+
+  .modal-nav {
+    gap: 5px;
+    margin-bottom: 10px;
+  }
+
+  .nav-button {
+    padding: 6px 12px;
+    font-size: 0.9rem;
+  }
+
+  .cosmeticos-list {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 8px;
+    padding: 5px;
+  }
+
+  .cosmetico-item {
+    padding: 5px;
+  }
+
+  .cosmetico-img {
+    max-height: 80px;
+    margin-bottom: 4px;
+  }
+
+  .user-header {
+    gap: 5px;
+  }
+
+  .user-info {
+    gap: 5px;
+  }
+
+  .user-photo {
+    width: 30px;
+    height: 30px;
+  }
+
+  .user-name {
+    font-size: 0.8rem;
+  }
+
+  .user-menu {
+    width: 150px;
+    padding: 5px;
+  }
+
+  .user-photo-large {
+    width: 60px;
+    height: 60px;
+  }
+
+  .user-name-large {
+    font-size: 1rem;
+    margin: 5px 0;
+  }
+
+  .user-coins,
+  .user-score {
+    font-size: 0.7rem;
+    margin: 3px 0;
+  }
+
+  .delete-button,
+  .googleBtn,
+  .logout-button {
+    font-size: 0.8rem;
+  }
+
+  .leaderboard-content {
+    max-width: 90%;
+    padding: 1rem;
+  }
+
+  .leaderboard-close-button {
+    font-size: 1rem;
+    top: 5px;
+    right: 5px;
+  }
+
+  .leaderboard-list li {
+    font-size: 1rem;
+    margin: 4px 0;
+  }
+
+  .current-user-score {
+    font-size: 0.7rem;
+    margin-top: 10px;
+  }
+}

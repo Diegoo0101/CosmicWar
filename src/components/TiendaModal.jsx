@@ -2,7 +2,6 @@ import { useState, useEffect } from 'react';
 import { auth } from '../firebase/config';
 import { getFirestore, collection, getDocs, doc, setDoc, query, where, getDoc } from 'firebase/firestore';
 
-
 const TiendaModal = ({ isOpen, onClose }) => {
   const db = getFirestore();
   const [categoriaActiva, setCategoriaActiva] = useState('Jugador');
@@ -36,7 +35,13 @@ const TiendaModal = ({ isOpen, onClose }) => {
     const obtenerCosmeticos = async () => {
       try {
         const querySnapshot = await getDocs(collection(db, 'cosmeticos'));
-        const datos = querySnapshot.docs.map(doc => doc.data());
+        const datos = querySnapshot.docs.map(doc => {
+          const data = doc.data();
+          return {
+            ...data,
+            id: doc.id
+          };
+        });
 
         const agrupados = {
           Jugador: [],
@@ -50,7 +55,6 @@ const TiendaModal = ({ isOpen, onClose }) => {
             agrupados[tipo].push(item);
           }
         });
-        
 
         setCosmeticosPorTipo(agrupados);
       } catch (error) {
@@ -69,7 +73,8 @@ const TiendaModal = ({ isOpen, onClose }) => {
           where('usuario', '==', user.uid)
         );
         const adquisicionesSnapshot = await getDocs(adquisicionesQuery);
-        const adquiridos = adquisicionesSnapshot.docs.map(doc => doc.data().cosmetico.nombre);
+        // Store the unique document IDs
+        const adquiridos = adquisicionesSnapshot.docs.map(doc => doc.data().cosmetico.id);
 
         setAdquisiciones(adquiridos);
       } catch (error) {
@@ -96,18 +101,23 @@ const TiendaModal = ({ isOpen, onClose }) => {
         alert('No tienes suficientes monedas para comprar este cosmético.');
         return;
       }
-  
-      // Actualiza las adquisiciones
+
       await setDoc(
-        doc(db, 'adquisiciones', `${user.uid}_${item.nombre}`),
+        doc(db, 'adquisiciones', `${user.uid}_${item.id}`),
         {
           usuario: user.uid,
-          cosmetico: item,
+          cosmetico: {
+            id: item.id,
+            nombre: item.nombre,
+            tipo: item.tipo,
+            imagen: item.imagen,
+            precio: item.precio,
+          },
           fecha: new Date().toISOString(),
         },
         { merge: true }
       );
-  
+
       // Resta las monedas del usuario
       const nuevasMonedas = coinCont - item.precio;
       await setDoc(
@@ -115,10 +125,10 @@ const TiendaModal = ({ isOpen, onClose }) => {
         { monedas: nuevasMonedas },
         { merge: true }
       );
-  
+
       // Actualiza el estado local
       setCoinCont(nuevasMonedas);
-      setAdquisiciones([...adquisiciones, item.nombre]);
+      setAdquisiciones([...adquisiciones, item.id]);
     } catch (error) {
       console.error('Error al realizar la compra:', error);
     }
@@ -151,7 +161,7 @@ const TiendaModal = ({ isOpen, onClose }) => {
                   <img src={`/assets/${item.tipo}/${item.imagen}.png`} alt={item.nombre} className="cosmetico-img" />
                   <p>{item.nombre}</p>
                   <p>{item.precio} monedas</p>
-                  {adquisiciones.includes(item.nombre) ? (
+                  {adquisiciones.includes(item.id) ? (
                     <p className="agotado-text">Agotado</p>
                   ) : (
                     <button onClick={() => comprar(item)}>Comprar</button>
