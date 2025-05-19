@@ -648,6 +648,9 @@ resetGame() {
     this.boss.destroy();
     this.boss = null;
   }
+
+  this.isMuted = false;
+  this.currentMusic = null;
 }
 
   // Actualiza gráfico de la barra de vida
