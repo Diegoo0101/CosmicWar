@@ -506,28 +506,30 @@ export default class GameScene extends Phaser.Scene {
   itemDrop(enemy) {
     // 10% de probabilidad de soltar item de multidisparo
     if (Phaser.Math.FloatBetween(0, 1) < 0.1) {
-      const powerUp = this.powerUps.create(enemy.x, enemy.y, 'item_multishot').setScale(0.8);
-      powerUp.setVelocityY(100);
+      const powerUp = this.powerUps.create(Phaser.Math.FloatBetween(enemy.x+15, enemy.x-15), Phaser.Math.FloatBetween(enemy.y+15, enemy.y-15), 'item_multishot').setScale(0.8);
+      powerUp.setVelocityY(Phaser.Math.FloatBetween(110, 90));
     }
     // 7% de probabilidad de soltar salud
     if (Phaser.Math.FloatBetween(0, 1) < 0.07) {
-      const health = this.hearts.create(enemy.x, enemy.y, 'item_health').setScale(1.3);
-      health.setVelocityY(100);
+      const health = this.hearts.create(Phaser.Math.FloatBetween(enemy.x+15, enemy.x-15), Phaser.Math.FloatBetween(enemy.y+15, enemy.y-15), 'item_health').setScale(1.3);
+      health.setVelocityY(Phaser.Math.FloatBetween(110, 90));
     }
     // 5% de probabilidad de soltar item de poder especial
     if (Phaser.Math.FloatBetween(0, 1) < 0.05) {
-      const fire = this.fires.create(enemy.x, enemy.y, 'item_specialshot').setScale(0.75).setDepth(8);
-      fire.setVelocityY(100);
+      const fire = this.fires.create(Phaser.Math.FloatBetween(enemy.x+15, enemy.x-15), Phaser.Math.FloatBetween(enemy.y+15, enemy.y-15), 'item_specialshot').setScale(0.75);
+      fire.setVelocityY(Phaser.Math.FloatBetween(110, 90));
     }
     // 5% de probabilidad de soltar item de reloj ralentizador
     if (Phaser.Math.FloatBetween(0, 1) < 0.05) {
-      const clock = this.clocks.create(enemy.x, enemy.y, 'item_stoptime').setScale(0.75);
-      clock.setVelocityY(100);
+      const clock = this.clocks.create(Phaser.Math.FloatBetween(enemy.x+15, enemy.x-15), Phaser.Math.FloatBetween(enemy.y+15, enemy.y-15), 'item_stoptime').setScale(0.75);
+      clock.setDepth(7);
+      clock.setVelocityY(Phaser.Math.FloatBetween(110, 90));
     }
     // 30% de probabilidad de soltar moneda
     if (Phaser.Math.FloatBetween(0, 1) < 0.3) {
-      const coin = this.coins.create(enemy.x, enemy.y, 'coin').setScale(0.25);
-      coin.setVelocityY(100);
+      const coin = this.coins.create(Phaser.Math.FloatBetween(enemy.x+15, enemy.x-15), Phaser.Math.FloatBetween(enemy.y+15, enemy.y-15), 'coin').setScale(0.25);
+      coin.setDepth(8);
+      coin.setVelocityY(Phaser.Math.FloatBetween(110, 90));
     }
   }
 
