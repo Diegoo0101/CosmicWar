@@ -889,11 +889,13 @@ resetGame() {
     } else if (this.currentWave === 4) {
       this.currentMusic.stop();
       this.currentMusic = this.oleada10;
+      this.currentMusic.loop = true;
       this.currentMusic.play();
       this.currentMusic.setMute(this.isMuted);
     } else if (this.currentWave === 9) {
       this.currentMusic.stop();
       this.currentMusic = this.oleada20;
+      this.currentMusic.loop = true;
       this.currentMusic.play();
       this.currentMusic.setMute(this.isMuted);
     }
