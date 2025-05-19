@@ -52,7 +52,7 @@ const PersonalizacionModal = ({ isOpen, onClose }) => {
     
         todosLosCosmeticos.forEach(item => {
           const tipo = item.tipo;
-          if (agrupados[tipo] && cosmeticosAdquiridos.some(c => c.nombre === item.nombre)) {
+          if (agrupados[tipo] && cosmeticosAdquiridos.some(c => c.nombre === item.nombre && c.tipo === item.tipo)) {
             agrupados[tipo].push(item);
           }
         });
