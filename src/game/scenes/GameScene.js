@@ -18,7 +18,7 @@ export default class GameScene extends Phaser.Scene {
     this.powerUps = null;
     // Determina si el jugador puede hacer multidisparo
     this.hasMultiShot = false;
-    // Objetos de corazones
+    // Objetos curativos
     this.hearts = null
     // Objetos para llenar la barra de poder especial
     this.fires = null;
@@ -67,7 +67,7 @@ export default class GameScene extends Phaser.Scene {
     this.player.setScale(0.7);
     this.player.setDepth(10);
 
-    // Controles
+    // Teclas de movimiento
     this.cursors = this.input.keyboard.createCursorKeys();
     this.wasd = this.input.keyboard.addKeys({
       up: Phaser.Input.Keyboard.KeyCodes.W,
@@ -75,16 +75,19 @@ export default class GameScene extends Phaser.Scene {
       left: Phaser.Input.Keyboard.KeyCodes.A,
       right: Phaser.Input.Keyboard.KeyCodes.D,
     })
-
     this.shift = this.input.keyboard.addKey("SHIFT");
+
     // Evita que la página haga scroll al pulsar espacio
     window.addEventListener('keydown', (event) => {
       if (event.code === 'Space') {
         event.preventDefault();
       }
     });
+    // Tecla de disparo
     this.spaceKey = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.SPACE);
+    // Cooldown de disparo al mantener pulsado
     this.shootCooldown = 0;
+    // Tecla de disparo especial
     this.keyZ = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.Z);
 
     // Balas
@@ -109,7 +112,7 @@ export default class GameScene extends Phaser.Scene {
 
     // Crear items de multidisparo
     this.powerUps = this.physics.add.group();
-    // Crear corazones curativos
+    // Crear items curativos
     this.hearts = this.physics.add.group();
     // Crear items de poder especial
     this.fires = this.physics.add.group();
@@ -118,14 +121,14 @@ export default class GameScene extends Phaser.Scene {
     // Crear monedas
     this.coins = this.physics.add.group();
 
-    // Tratar colisión entre personaje e items
+    // Tratar colisión entre nave e items
     this.physics.add.overlap(this.player, this.hearts, this.collectHeart, null, this);
     this.physics.add.overlap(this.player, this.powerUps, this.collectPowerUp, null, this);
     this.physics.add.overlap(this.player, this.fires, this.collectFire, null, this);
     this.physics.add.overlap(this.player, this.clocks, this.collectClock, null, this);
     this.physics.add.overlap(this.player, this.coins, this.collectCoin, null, this);
 
-    // Crear balas enemigas
+    // Balas enemigas
     this.enemyBullets = this.physics.add.group();
     // Colisión entre balas enemigas y el jugador
     this.physics.add.overlap(this.player, this.enemyBullets, this.handleEnemyBulletHit, null, this);
@@ -150,17 +153,17 @@ export default class GameScene extends Phaser.Scene {
     this.powerupSFX = this.sound.add('powerup');
     this.monedaSFX = this.sound.add('moneda');
     this.especialSFX = this.sound.add('especial');
-
+    // Música
     this.oleada1_1 = this.sound.add('oleada1-1');
     this.oleada1_2 = this.sound.add('oleada1-2');
     this.oleada10 = this.sound.add('oleada10');
     this.oleada20 = this.sound.add('oleada20');
 
 
-    // Cooldown de disparos del jefe (Se actualiza según el delay)
+    // Cooldown de disparos del jefe
     this.bossShootCooldown = 0;
 
-    //Botón de música
+    //Botón de mute de música
     this.muteButton = this.add.image(this.scale.width - 40, 40, 'unmute')
       .setInteractive()
       .setScrollFactor(0)
@@ -204,26 +207,26 @@ export default class GameScene extends Phaser.Scene {
       this.player.setVelocityY(0);
     }
 
-    // Pulsar el espacio
+    // Disparo (pulsar espacio)
     if (Phaser.Input.Keyboard.JustDown(this.spaceKey)) {
       this.shootBullet();
       this.shootCooldown = time + 200;
     }
 
-    // Mantener pulsado el espacio
+    // Disparo (mantener espacio)
     if (this.spaceKey.isDown) {
       if (time > this.shootCooldown) {
         this.shootBullet();
         this.shootCooldown = time + 200;
       }
     }
-    // Disparo especial
+    // Disparo especial (pulsar Z)
     if (Phaser.Input.Keyboard.JustDown(this.keyZ)) {
       this.specialShot();
     }
     // Balas del jugador en pantalla
     this.bullets.getChildren().forEach(bullet => {
-      // Elimina las balas del jugador que se salen del mapa
+      // Elimina las que se salen del mapa
       if (bullet.y < 0) {
         bullet.setActive(false).setVisible(false);
         bullet.body.stop();
@@ -234,18 +237,17 @@ export default class GameScene extends Phaser.Scene {
 
     // Enemigos en pantalla
     this.enemies.getChildren().forEach(enemy => {
-      // Refresca la velocidad de los enemigos si el tiempo está ralentizado o no
+      // Refresca la velocidad según si el tiempo está ralentizado o no
       const targetSpeed = this.slowTime ? 30 : 50 + this.currentWave * 10;
       if (enemy.body.velocity.y !== targetSpeed) {
         enemy.setVelocityY(targetSpeed);
       }
 
-      // Verificar si el enemigo está fuera de la pantalla
+      // Verifica si se ha salido de la pantalla
       if (enemy.y > this.game.config.height) {
         this.playerHealth -= 3;
         this.updateHealthBar();
         if (this.playerHealth === 0 && !this.isPlayerDead) {
-          // Jugador muere y explota
           this.isPlayerDead = true;
           this.player.visible = false;
           const explosion = this.add.sprite(this.player.x, this.player.y, 'explosion');
@@ -255,36 +257,37 @@ export default class GameScene extends Phaser.Scene {
           explosion.on('animationcomplete', () => {
             this.gameOver();
           });
-        }   
+        }
+        // Vuelve a spawnear en la parte superior
         enemy.setPosition(Phaser.Math.Between(50, 550), 0);
       }
 
-       // Refresca el cooldown de los disparos si el tiempo está ralentizado o no
+      // Refresca el cooldown según si el tiempo está ralentizado o no
       const shootDelay = this.slowTime ? 1500 : 800;
       if (time > enemy.shootCooldown) {
         this.enemyShoot(enemy);
         enemy.shootCooldown = time + shootDelay + Phaser.Math.Between(-200, 200);
-    }
+      }
     });
 
     // Balas enemigas en pantalla
     this.enemyBullets.getChildren().forEach(bullet => {
       if (!bullet.active) return;
     
-      // Desactiva si la bala enemiga se sale de pantalla
+      // Elimina las que se salen de la pantalla
       if (bullet.y > this.game.config.height || bullet.y < 0 || bullet.x > this.game.config.width || bullet.x < 0) {
         bullet.setActive(false).setVisible(false);
         bullet.body.stop();
         bullet.destroy();
         return;
       }
+          
+      // Refresca la velocidad según si el tiempo está ralentizado o no
+      const newSpeed = this.slowTime ? 60 : 200 + (this.currentWave * 10);
     
       // Obtener dirección actual normalizada
       const velocity = bullet.body.velocity;
       const angle = Math.atan2(velocity.y, velocity.x);
-    
-      // Calcular nueva velocidad según slowTime
-      const newSpeed = this.slowTime ? 60 : 200 + (this.currentWave * 10);
     
       // Aplicar la nueva velocidad en la misma dirección
       bullet.setVelocity(
@@ -294,7 +297,7 @@ export default class GameScene extends Phaser.Scene {
     });
     
 
-    // Si el jefe baja lo suficiente se detiene y comienza a moverse lateralmente
+    // Si el jefe llega hasta la posición stopY se detiene y comienza a moverse lateralmente
     if (this.boss && !this.boss.hasStartedMovingSideways && this.boss.y >= this.boss.stopY) {
       this.boss.setVelocityY(0);
       this.boss.setVelocityX(this.slowTime ? 30 : 50);
@@ -332,6 +335,7 @@ export default class GameScene extends Phaser.Scene {
       this.grayscaleApplied = false;
     }
 
+    //Coloca la imagen del disparo especial sobre el jugador
     if (this.activeSpecialBullet && this.player) {
       this.activeSpecialBullet.x = this.player.x;
       this.activeSpecialBullet.y = this.player.y - (this.player.displayHeight / 2) - (this.activeSpecialBullet.displayHeight / 2);
@@ -342,8 +346,8 @@ export default class GameScene extends Phaser.Scene {
   shootBullet() {
     if(this.isPlayerDead) return;
     this.disparo_jugadorSFX.play();
+    // Si tiene multidisparo
     if (this.hasMultiShot) {
-      // Si tiene multidisparo
       const offsets = [-10, -5, 0, 5, 10];
       const speedY = -300;
       const horizontalSpreadFactor = 10;
@@ -358,8 +362,8 @@ export default class GameScene extends Phaser.Scene {
 
         bullet.setAngle(Phaser.Math.RadToDeg(angle) + 90);
       });
-    } else {
       // Si no tiene multidisparo
+    } else {
       const bullet = this.bullets.create(this.player.x, this.player.y - 20, 'bullet');
       bullet.setVelocityY(-300);
       bullet.setScale(0.02);
@@ -380,7 +384,7 @@ export default class GameScene extends Phaser.Scene {
         this.activeSpecialBullet = null;
       }
 
-      // Sprite
+      // Sprite y efecto de sonido
       this.especialSFX.play();
       const specialBullet = this.add.image(this.player.x, this.player.y, 'specialbullet');
       specialBullet.setDepth(11);
@@ -437,6 +441,7 @@ export default class GameScene extends Phaser.Scene {
         }
       }
 
+      // Destruye el sprite después de 1 segundo
       this.time.delayedCall(1000, () => {
         if (this.activeSpecialBullet) {
           this.activeSpecialBullet.destroy();
@@ -451,9 +456,9 @@ export default class GameScene extends Phaser.Scene {
 
   // Spawnea un enemigo
   spawnEnemy() {
-    // Si han spawneado todos los enemigos de la oleada no lo hace
+    // Si han spawneado todos los enemigos de la oleada no spawnea más
     if (this.currentWaveEnemies >= this.waveEnemyCount) return;
-  
+
     this.currentWaveEnemies++;
   
     const x = Phaser.Math.Between(50, 550);
@@ -472,7 +477,7 @@ export default class GameScene extends Phaser.Scene {
       enemy.vida -= 3;
     }
     if (bullet) bullet.destroy();
-
+    // Enemigo no muere
     if (enemy.vida > 0) {
       this.impactoSFX.play();
       // Animación de parpadeo, indicando que recibe daño
@@ -487,8 +492,8 @@ export default class GameScene extends Phaser.Scene {
           enemy.alpha = 1;
         }
       });
+      // Enemigo muere
     } else {
-      // Enemigo muere y explota
       this.enemiesDefeated++;
       const explosion = this.add.sprite(enemy.x, enemy.y, 'explosion');
       explosion.setScale(0.7);
@@ -542,9 +547,8 @@ export default class GameScene extends Phaser.Scene {
       this.playerHealth -= 0.5;
     }
     this.updateHealthBar();
-
+    // Jugador muere
     if (this.playerHealth === 0 && !this.isPlayerDead) {
-      // Jugador muere y explota
       this.isPlayerDead = true;
       this.player.visible = false;
       const explosion = this.add.sprite(this.player.x, this.player.y, 'explosion');
@@ -557,12 +561,14 @@ export default class GameScene extends Phaser.Scene {
     }    
   }
 
-  // Fin de la partida tras muerte del jugador
+  // Maneja el fin de la partida
   gameOver() {
+    // Detiene el spawneo de enemigos
     if (this.spawnTimer) {
       this.spawnTimer.remove();
       this.spawnTimer = null;
     }
+
     this.currentMusic.stop();
     this.cameras.main.setPostPipeline('GrayscalePipeline');
     this.grayscaleApplied = true;
@@ -574,6 +580,7 @@ export default class GameScene extends Phaser.Scene {
       this.add.text(150, 250, `Monedas: ${this.contCoins}`, { fontFamily: '"Press Start 2P"', fontSize: '24px', fill: '#fff', stroke: '#000000', strokeThickness: 4 });
       this.add.text(150, 350, 'GAME OVER', { fontFamily: '"Press Start 2P"', fontSize: '24px', fill: '#fff', stroke: '#000000', strokeThickness: 4 });
     });
+
     // Verifica si el usuario ha iniciado sesión
     const user = auth.currentUser;
     if (user) {
@@ -582,16 +589,16 @@ export default class GameScene extends Phaser.Scene {
       getDoc(userDocRef).then((docSnapshot) => {
         let currentPuntuacion = 0;
         let currentMonedas = 0;
-
+        // Obtiene los datos del usuario
         if (docSnapshot.exists()) {
           const data = docSnapshot.data();
           currentPuntuacion = data.puntuacion || 0;
           currentMonedas = data.monedas || 0;
         }
 
-        // Actualizar sólo si la puntuación es mayor
+        // Actualiza la puntuación si es mayor a la anterior
         const newPuntuacion = this.puntuacion > currentPuntuacion ? this.puntuacion : currentPuntuacion;
-        // Sumar las monedas actuales con las nuevas
+        // Suma las monedas nuevas con las actuales
         const newMonedas = currentMonedas + this.contCoins;
         // Guardar los valores actualizados en Firestore
         return setDoc(
@@ -609,51 +616,51 @@ export default class GameScene extends Phaser.Scene {
 
     // Habilitar reinicio tras 2 segundos
     this.time.delayedCall(2000, () => {
-    this.add.text(this.scale.width/2, 460, 'Presiona cualquier tecla', { fontFamily: '"Press Start 2P"', fontSize: '16px', fill: '#fff', stroke: '#000000', strokeThickness: 4 }).setOrigin(0.5);
-    this.add.text(this.scale.width/2, 500, 'para volver al título.', { fontFamily: '"Press Start 2P"', fontSize: '16px', fill: '#fff', stroke: '#000000', strokeThickness: 4 }).setOrigin(0.5);
+      this.add.text(this.scale.width/2, 460, 'Presiona cualquier tecla', { fontFamily: '"Press Start 2P"', fontSize: '16px', fill: '#fff', stroke: '#000000', strokeThickness: 4 }).setOrigin(0.5);
+      this.add.text(this.scale.width/2, 500, 'para volver al título.', { fontFamily: '"Press Start 2P"', fontSize: '16px', fill: '#fff', stroke: '#000000', strokeThickness: 4 }).setOrigin(0.5);
 
-    // Detectar cualquier tecla para reiniciar el juego
-    this.input.keyboard.once('keydown', () => {
-      this.resetGame();
-      this.scene.start('TitleScene');
+      // Si se pulsa cualquier tecla
+      this.input.keyboard.once('keydown', () => {
+        this.resetGame();
+        this.scene.start('TitleScene');
+      });
     });
-  });
-}
-
-// Método para reiniciar valores críticos
-resetGame() {
-  this.playerHealth = 100;
-  this.isPlayerDead = false;
-  this.contFires = 0;
-  this.contCoins = 0;
-  this.puntuacion = 0;
-  this.currentWave = 0;
-  this.bossActive = false;
-  this.grayscaleApplied = false;
-
-  // Limpia grupos de enemigos, balas, etc.
-  this.enemies.clear(true, true);
-  this.bullets.clear(true, true);
-  this.enemyBullets.clear(true, true);
-  this.powerUps.clear(true, true);
-  this.hearts.clear(true, true);
-  this.fires.clear(true, true);
-  this.clocks.clear(true, true);
-  this.coins.clear(true, true);
-
-  // Reinicia las barras de vida y poder especial
-  this.updateHealthBar();
-  this.updateSpecialBar();
-
-  // Elimina el jefe si está activo
-  if (this.boss) {
-    this.boss.destroy();
-    this.boss = null;
   }
 
-  this.isMuted = false;
-  this.currentMusic = null;
-}
+  // Reinicia todos los valores críticos del juego
+  resetGame() {
+    this.playerHealth = 100;
+    this.isPlayerDead = false;
+    this.contFires = 0;
+    this.contCoins = 0;
+    this.puntuacion = 0;
+    this.currentWave = 0;
+    this.bossActive = false;
+    this.grayscaleApplied = false;
+
+    // Limpia grupos de enemigos, balas, etc.
+    this.enemies.clear(true, true);
+    this.bullets.clear(true, true);
+    this.enemyBullets.clear(true, true);
+    this.powerUps.clear(true, true);
+    this.hearts.clear(true, true);
+    this.fires.clear(true, true);
+    this.clocks.clear(true, true);
+    this.coins.clear(true, true);
+
+    // Reinicia las barras de vida y poder especial
+    this.updateHealthBar();
+    this.updateSpecialBar();
+
+    // Elimina el jefe si está activo
+    if (this.boss) {
+      this.boss.destroy();
+      this.boss = null;
+    }
+
+    this.isMuted = false;
+    this.currentMusic = null;
+  }
 
   // Actualiza gráfico de la barra de vida
   updateHealthBar() {
@@ -767,17 +774,19 @@ resetGame() {
     bullet.destroy();
     this.impacto_jugadorSFX.play();
     if (this.isPlayerDead) return;
+
     if(this.currentWave < 10) {
       this.playerHealth -= 1 + (0.05 * this.currentWave);
     } else {
       this.playerHealth -= 1.5;
     }
+    // El jefe hace 0.5 de daño extra
     if (this.bossActive) {
       this.playerHealth -= 0.5;
     }
     this.updateHealthBar();
 
-    // Si el jugador muere
+    // El jugador muere
     if (this.playerHealth === 0 && !this.isPlayerDead) {
       this.isPlayerDead = true;
       this.player.visible = false;
@@ -807,7 +816,7 @@ resetGame() {
     bullet.setScale(0.1);
   }
 
-  // Sistema de oleadas
+  // Maneja el inicio de una oleada
   startWave() {
     // Enemigos spawneados
     this.currentWaveEnemies = 0;
@@ -822,7 +831,7 @@ resetGame() {
 
     let spawnRate = Math.max(200, this.slowTime ? 2000 : 1000);
 
-    // Mostrar el texto de la nueva oleada
+    // Texto de nueva oleada
     if (this.waveText) {
       this.waveText.destroy();
     }
@@ -841,7 +850,7 @@ resetGame() {
     ).setOrigin(0.5)
     this.waveText.setDepth(999);
 
-    // Crear la animación
+    // Animación de texto
     this.tweens.add({
       targets: this.waveText,
       x: this.scale.width / 2,
@@ -868,7 +877,7 @@ resetGame() {
       }
     });
 
-    // Iniciar spawner
+    // Iniciar spawner de enemigos
     this.spawnTimer = this.time.addEvent({
       delay: spawnRate,
       callback: this.spawnEnemy,
@@ -878,7 +887,10 @@ resetGame() {
 
     this.setMusic();
   }
+
+  // Hace sonar la música según la oleada y el estado de muteo.
   setMusic() {
+    // Oleada 1
     if (this.currentWave === 0) {
       if (Phaser.Math.FloatBetween(0, 1) < 0.5) {
         this.currentMusic = this.oleada1_1;
@@ -888,12 +900,14 @@ resetGame() {
       this.currentMusic.loop = true;
       this.currentMusic.play();
       this.currentMusic.setMute(this.isMuted);
+      // Oleada 5
     } else if (this.currentWave === 4) {
       this.currentMusic.stop();
       this.currentMusic = this.oleada10;
       this.currentMusic.loop = true;
       this.currentMusic.play();
       this.currentMusic.setMute(this.isMuted);
+      // Oleada 10
     } else if (this.currentWave === 9) {
       this.currentMusic.stop();
       this.currentMusic = this.oleada20;
@@ -903,6 +917,7 @@ resetGame() {
     }
   }
 
+  // Manjea el muteo de la música y cambia el icono del botón
   toggleMute() {
     this.isMuted = !this.isMuted;
     if (this.currentMusic) {
@@ -918,6 +933,7 @@ resetGame() {
       this.spawnBoss();
     }
   }
+
   // Spawnea al jefe
   spawnBoss() {
     this.jefeSFX.play();
@@ -939,8 +955,10 @@ resetGame() {
       stroke: '#000000',
       strokeThickness: 1
     }).setOrigin(0.5);
+    this.jefeText.setDepth(999);
     this.bossHealthBar = this.add.graphics();
     this.bossHealthBar.setVisible = true;
+    this.bossHealthBar.setDepth(999);
     this.updateBossHealthBar();
   
     // Colisión con balas
