@@ -1,196 +1,252 @@
-
-/* Media Queries for Small Screens */
-
 @media (max-width: 768px) {
   .navbar {
-    display: flex;
-    justify-content: space-between; /* Keep space between */
-    align-items: center;
-    padding: 0.5rem; /* Reduced padding */
-    overflow-x: auto; /* Enable horizontal scroll */
-    white-space: nowrap; /* Prevent wrapping */
-    -webkit-overflow-scrolling: touch; /* Smooth scroll on iOS */
+    flex-direction: column;
+    align-items: flex-start;
+    padding: 1rem;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
   }
 
   .navbar-title {
-    font-size: 1.2rem;
-    margin-right: 1rem; /* Add spacing after title */
+    font-size: 1.8rem;
+    margin-bottom: 0.8rem;
+    align-self: center;
   }
 
   .navbar-links {
-    display: flex;
+    flex-direction: column;
+    gap: 0.8rem;
+    width: 100%;
     align-items: center;
-    gap: 0.5rem; /* Reduced gap */
-    margin: 0;
-    padding: 0;
   }
 
   .navbar-links li {
-    display: inline-block; /* Keep items in line */
+    width: 100%;
+    text-align: center;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+
+  .navbar-links li .link-button,
+  .footer-links li .link-button,
+  .googleBtn {
+    font-size: 0.95rem;
+    padding: 0.6rem 1.2rem;
+    width: 90%;
+    max-width: 250px;
   }
 
   .main-content {
-    padding-left: 1rem;
-    padding-right: 1rem;
+    padding: 2rem 1rem;
+    flex-direction: column;
   }
 
   #phaser-container {
-    width: 90%;
-    border-radius: 20px;
-    padding: 10px;
-    margin-top: 1rem;
-    margin-bottom: 1rem;
+    width: 95%;
+    max-width: unset;
   }
-
+ 
   .footer {
     flex-direction: column;
-    text-align: center;
+    padding: 1.5rem 1rem;
     align-items: center;
-    padding: 20px 10px 0px;
-    display: block;
+    min-height: unset;
+    padding-bottom: 5rem;
   }
 
   .footer-title {
-    font-size: 1.2rem;
+    font-size: 1.8rem;
+    margin-bottom: 1rem;
+    text-align: center;
+    flex-basis: auto;
     width: 100%;
-    margin-bottom: 10px;
   }
 
   .footer-links {
-    flex-direction: row;
+    flex-direction: column;
     align-items: center;
-    justify-content: center;
+    margin: 1rem 0;
+    flex-basis: auto;
     width: 100%;
-    gap: 10px;
   }
 
-  .como-jugar-layout {
-    flex-direction: column;
+  .footer-links li {
+    margin-bottom: 0.5rem;
   }
 
-  .column {
-    flex-direction: column;
+  .footer-links li:last-child {
+    margin-bottom: 0;
   }
 
-  .como-jugar-content {
-    max-width: 100%;
+  .footer-social {
+    align-items: center;
+    margin-top: 1.5rem;
+    flex-basis: auto;
+    width: 100%;
   }
 
-  .volver-btn {
-    margin-top: 20px;
-    padding: 10px 20px;
+  .footer-social h3 {
     font-size: 1rem;
+    margin-bottom: 0.8rem;
   }
 
-  .como-jugar-content img {
-    width: 24px;
-    height: 24px;
-    margin-right: 5px;
+  .social-icons {
+    gap: 15px;
+  }
+
+  .social-icon {
+    width: 28px;
+    height: 28px;
+  }
+
+  .copyright-notice {
+    position: absolute;
+    bottom: 1rem;
+    left: 0;
+    right: 0;
+    font-size: 0.75rem;
+    padding-top: 0.8rem;
+    margin-top: 1.5rem;
+  }
+
+ 
+  .modal-overlay {
+    padding: 1rem;
   }
 
   .modal-content {
-    width: 90%;
-    padding: 15px;
+    width: 95%;
+    max-width: 95%;
+    margin: 0 auto;
+    padding: 20px;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    left: 50%;
   }
 
   .close-button {
-    top: 10px;
+    font-size: 1.5rem;
     right: 10px;
-    font-size: 1rem;
+    top: 10px;
   }
 
   .modal-title {
-    font-size: 1.1rem;
-    margin-bottom: 10px;
+    font-size: 1.8rem;
+    margin-bottom: 15px;
   }
 
   .modal-nav {
-    gap: 5px;
-    margin-bottom: 10px;
+    flex-direction: column;
+    gap: 8px;
+    margin-bottom: 15px;
   }
 
   .nav-button {
-    padding: 6px 12px;
+    padding: 8px 12px;
     font-size: 0.9rem;
+    width: 100%;
   }
 
   .cosmeticos-list {
-    grid-template-columns: repeat(2, 1fr);
-    gap: 8px;
-    padding: 5px;
+    grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+    gap: 15px;
+    max-height: 350px;
   }
 
   .cosmetico-item {
-    padding: 5px;
+    padding: 10px;
+    font-size: 0.85rem;
   }
 
   .cosmetico-img {
-    max-height: 80px;
-    margin-bottom: 4px;
-  }
-
-  .user-header {
-    gap: 5px;
-  }
-
-  .user-info {
-    gap: 5px;
-  }
-
-  .user-photo {
-    width: 30px;
-    height: 30px;
-  }
-
-  .user-name {
-    font-size: 0.8rem;
-  }
-
-  .user-menu {
-    width: 150px;
-    padding: 5px;
-  }
-
-  .user-photo-large {
     width: 60px;
     height: 60px;
   }
 
-  .user-name-large {
-    font-size: 1rem;
-    margin: 5px 0;
-  }
-
-  .user-coins,
-  .user-score {
-    font-size: 0.7rem;
-    margin: 3px 0;
-  }
-
-  .delete-button,
-  .googleBtn,
-  .logout-button {
+  .cosmetico-item button {
+    padding: 6px 10px;
     font-size: 0.8rem;
   }
 
-  .leaderboard-content {
-    max-width: 90%;
-    padding: 1rem;
+  .agotado-text {
+    font-size: 0.8rem;
   }
 
-  .leaderboard-close-button {
+  .current-user-coins {
     font-size: 1rem;
-    top: 5px;
-    right: 5px;
+    margin-bottom: 15px;
+  }
+
+  .personalizacion-content {
+    max-width: 95%;
+    padding: 20px;
+  }
+
+  .personalizacion-nav {
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .personalizacion-list {
+    grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+    gap: 15px;
+    max-height: 300px;
+  }
+
+  .personalizacion-item {
+    padding: 8px;
+  }
+
+  .personalizacion-item img {
+    width: 50px;
+    height: 50px;
+  }
+
+  .personalizacion-item button {
+    padding: 5px 8px;
+    font-size: 0.75rem;
+  }
+
+ 
+  .leaderboard-content {
+    max-width: 90%;
+    padding: 20px;
+    border-width: 1px;
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.6);
+  }
+
+  .leaderboard-list {
+    margin-top: 15px;
+    padding: 10px;
   }
 
   .leaderboard-list li {
     font-size: 1rem;
-    margin: 4px 0;
+    padding: 6px 10px;
+    margin: 8px 0;
   }
 
   .current-user-score {
-    font-size: 0.7rem;
-    margin-top: 10px;
+    margin-top: 15px;
+    font-size: 0.9rem;
+    padding-top: 10px;
+  }
+
+  .cosmeticos-list::-webkit-scrollbar,
+  .leaderboard-list::-webkit-scrollbar,
+  .personalizacion-list::-webkit-scrollbar {
+    width: 6px;
+  }
+
+  .cosmeticos-list::-webkit-scrollbar-thumb,
+  .leaderboard-list::-webkit-scrollbar-thumb,
+  .personalizacion-list::-webkit-scrollbar-thumb {
+    border-radius: 3px;
+  }
+ 
+  .mensaje-error {
+    margin: 8px 0;
+    padding: 8px;
+    font-size: 0.9rem;
   }
 }

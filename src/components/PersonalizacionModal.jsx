@@ -127,7 +127,7 @@ const PersonalizacionModal = ({ isOpen, onClose }) => {
   return (
     <div className="modal-overlay">
       <div className="modal-content">
-        <button className="close-button" onClick={handleClose}>X</button>
+        <button className="close-button" onClick={handleClose}>✖</button>
         {user ? (
           <>
             <h2 className="modal-title">Personalización</h2>

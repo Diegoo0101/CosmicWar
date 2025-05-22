@@ -207,19 +207,14 @@ export default class GameScene extends Phaser.Scene {
       this.player.setVelocityY(0);
     }
 
-    // Disparo (pulsar espacio)
-    if (Phaser.Input.Keyboard.JustDown(this.spaceKey)) {
-      this.shootBullet();
-      this.shootCooldown = time + 200;
-    }
-
-    // Disparo (mantener espacio)
-    if (this.spaceKey.isDown) {
+    // Disparo normal (pulsar espacio)
+    if (this.spaceKey.isDown || Phaser.Input.Keyboard.JustDown(this.spaceKey)) {
       if (time > this.shootCooldown) {
         this.shootBullet();
         this.shootCooldown = time + 200;
       }
     }
+    
     // Disparo especial (pulsar Z)
     if (Phaser.Input.Keyboard.JustDown(this.keyZ)) {
       this.specialShot();
@@ -575,9 +570,9 @@ export default class GameScene extends Phaser.Scene {
     this.physics.pause();
 
     this.time.delayedCall(100, () => {
-      this.add.text(150, 150, `Oleada: ${this.currentWave + 1}`, { fontFamily: '"Press Start 2P"', fontSize: '24px', fill: '#fff', stroke: '#000000', strokeThickness: 4 });
-      this.add.text(150, 200, `Puntuación: ${this.puntuacion}`, { fontFamily: '"Press Start 2P"', fontSize: '24px', fill: '#fff', stroke: '#000000', strokeThickness: 4 });
-      this.add.text(150, 250, `Monedas: ${this.contCoins}`, { fontFamily: '"Press Start 2P"', fontSize: '24px', fill: '#fff', stroke: '#000000', strokeThickness: 4 });
+      this.add.text(150, 150, `Oleada: ${this.currentWave + 1}`, { fontFamily: '"Press Start 2P"', fontSize: '24px', fill: '#fff', stroke: '#000000', strokeThickness: 4 }).setDepth(9999);
+      this.add.text(150, 200, `Puntuación: ${this.puntuacion}`, { fontFamily: '"Press Start 2P"', fontSize: '24px', fill: '#fff', stroke: '#000000', strokeThickness: 4 }).setDepth(9999);
+      this.add.text(150, 250, `Monedas: ${this.contCoins}`, { fontFamily: '"Press Start 2P"', fontSize: '24px', fill: '#fff', stroke: '#000000', strokeThickness: 4 }).setDepth(9999);
       this.add.text(150, 350, 'GAME OVER', { fontFamily: '"Press Start 2P"', fontSize: '24px', fill: '#fff', stroke: '#000000', strokeThickness: 4 });
     });
 
@@ -616,8 +611,8 @@ export default class GameScene extends Phaser.Scene {
 
     // Habilitar reinicio tras 2 segundos
     this.time.delayedCall(2000, () => {
-      this.add.text(this.scale.width/2, 460, 'Presiona cualquier tecla', { fontFamily: '"Press Start 2P"', fontSize: '16px', fill: '#fff', stroke: '#000000', strokeThickness: 4 }).setOrigin(0.5);
-      this.add.text(this.scale.width/2, 500, 'para volver al título.', { fontFamily: '"Press Start 2P"', fontSize: '16px', fill: '#fff', stroke: '#000000', strokeThickness: 4 }).setOrigin(0.5);
+      this.add.text(this.scale.width/2, 460, 'Presiona cualquier tecla', { fontFamily: '"Press Start 2P"', fontSize: '16px', fill: '#fff', stroke: '#000000', strokeThickness: 4 }).setOrigin(0.5).setDepth(9999);
+      this.add.text(this.scale.width/2, 500, 'para volver al título.', { fontFamily: '"Press Start 2P"', fontSize: '16px', fill: '#fff', stroke: '#000000', strokeThickness: 4 }).setOrigin(0.5).setDepth(9999);
 
       // Si se pulsa cualquier tecla
       this.input.keyboard.once('keydown', () => {

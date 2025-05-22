@@ -2,8 +2,8 @@ import { useState, useEffect } from 'react';
 import { GoogleAuthProvider, signInWithPopup, signOut, onAuthStateChanged } from 'firebase/auth';
 import { auth } from '../firebase/config';
 import { getFirestore, doc, setDoc, getDoc, deleteDoc, collection, query, where, getDocs, writeBatch, onSnapshot } from 'firebase/firestore';
-  
 const db = getFirestore();
+import googleIcon from '/assets/google-icon.png';
   
 const GoogleAuthButton = () => {
   const [user, setUser] = useState(null);
@@ -154,13 +154,13 @@ const GoogleAuthButton = () => {
             </button>
           </div>
         )}
-        <button onClick={handleLogout} className="logout-button">X</button>
+        <button onClick={handleLogout} className="logout-button">✖</button>
       </div>
     );
   } else {
     return (
       <button onClick={handleLogin} className="googleBtn">
-        <img src="https://upload.wikimedia.org/wikipedia/commons/c/c1/Google_%22G%22_logo.svg" alt="Google Logo" />
+        <img src={googleIcon} alt="Google Logo" />
         Iniciar sesión con Google
       </button>
     );

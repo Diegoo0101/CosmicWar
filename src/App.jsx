@@ -8,6 +8,9 @@ import ClasificacionModal from './components/ClasificacionModal';
 import TiendaModal from './components/TiendaModal';
 import PersonalizacionModal from './components/PersonalizacionModal';
 import { useState } from 'react';
+import twitterIcon from '/assets/twitter-icon.png';
+import facebookIcon from '/assets/facebook-icon.png';
+import instagramIcon from '/assets/instagram-icon.png';
 
 
 function App() {
@@ -35,14 +38,29 @@ function App() {
           </Routes>
         </main>
         <footer className="footer">
-  <Link to="/" className="footer-title">CosmicWar</Link>
-  <ul className="footer-links">
-    <li><a href="/como-jugar" className="link-button">Cómo jugar</a></li>
-    <li><button onClick={() => setIsShopOpen(true)} className="link-button">Tienda</button></li>
-    <li><button onClick={() => setIsPersonalizationOpen(true)} className="link-button">Personalización</button></li>
-    <li><button onClick={() => setIsLeaderboardOpen(true)} className="link-button">Tabla de clasificación</button></li>
-  </ul>
-</footer>
+          <Link to="/" className="footer-title">CosmicWar</Link>
+          <ul className="footer-links">
+            <li><a href="/como-jugar" className="link-button">Cómo jugar</a></li>
+            <li><button onClick={() => setIsShopOpen(true)} className="link-button">Tienda</button></li>
+            <li><button onClick={() => setIsPersonalizationOpen(true)} className="link-button">Personalización</button></li>
+            <li><button onClick={() => setIsLeaderboardOpen(true)} className="link-button">Tabla de clasificación</button></li>
+          </ul>
+          <div className="footer-social">
+            <h3 className="social-title">Síguenos</h3>
+            <div className="social-icons">
+              <a href="https://twitter.com" target="_blank" rel="noopener noreferrer">
+                <img src={twitterIcon} alt="Twitter" className="social-icon"/>
+              </a>
+              <a href="https://facebook.com" target="_blank" rel="noopener noreferrer">
+                <img src={facebookIcon} alt="Facebook" className="social-icon"/>
+              </a>
+              <a href="https://instagram.com" target="_blank" rel="noopener noreferrer">
+                <img src={instagramIcon} alt="Instagram" className="social-icon"/>
+              </a>
+            </div>
+          </div>
+          <p className="copyright-notice">© 2025 CosmicWar. Todos los derechos reservados.</p>
+        </footer>
 
         <TiendaModal isOpen={isShopOpen} onClose={() => setIsShopOpen(false)} />
         <PersonalizacionModal isOpen={isPersonalizationOpen} onClose={() => setIsPersonalizationOpen(false)} />

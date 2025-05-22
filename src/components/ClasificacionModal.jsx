@@ -50,7 +50,7 @@ const ClasificacionModal = ({ isOpen, onClose }) => {
   return (
     <div className="modal-overlay">
       <div className="modal-content">
-        <button className="close-button" onClick={onClose}>X</button>
+        <button className="close-button" onClick={onClose}>✖</button>
         <h2 className="modal-title">Tabla de Clasificación</h2>
         <ul className="leaderboard-list">
           {topUsers.map((user, index) => (

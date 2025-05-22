@@ -12,6 +12,9 @@ const TiendaModal = ({ isOpen, onClose }) => {
   });
   const [adquisiciones, setAdquisiciones] = useState([]);
   const [coinCont, setCoinCont] = useState(null);
+  const [mensajeError, setMensajeError] = useState('');
+  const [mostrarMensajeError, setMostrarMensajeError] = useState(false); // New state for controlling visibility
+
 
   useEffect(() => {
     // Obtiene las monedas del usuario
@@ -89,6 +92,19 @@ const TiendaModal = ({ isOpen, onClose }) => {
     }
   }, [isOpen]);
 
+  // Effect to manage the error message visibility and disappearance
+  useEffect(() => {
+    if (mensajeError) {
+      setMostrarMensajeError(true);
+      const timer = setTimeout(() => {
+        setMostrarMensajeError(false);
+        // After the transition, clear the message content
+        setTimeout(() => setMensajeError(''), 1000); // 1000ms matches the CSS transition duration
+      }, 3000); // Message visible for 3 seconds before fading
+      return () => clearTimeout(timer);
+    }
+  }, [mensajeError]);
+
   if (!isOpen) return null;
 
   const user = auth.currentUser;
@@ -96,54 +112,59 @@ const TiendaModal = ({ isOpen, onClose }) => {
 
   // Si el usuario compra un cosmético
   const comprar = async (item) => {
-    try {
-      if (coinCont < item.precio) {
-        alert('No tienes suficientes monedas para comprar este cosmético.');
-        return;
-      }
-
-      await setDoc(
-        doc(db, 'adquisiciones', `${user.uid}_${item.id}`),
-        {
-          usuario: user.uid,
-          cosmetico: {
-            id: item.id,
-            nombre: item.nombre,
-            tipo: item.tipo,
-            imagen: item.imagen,
-            precio: item.precio,
-          },
-          fecha: new Date().toISOString(),
-        },
-        { merge: true }
-      );
-
-      // Resta las monedas del usuario
-      const nuevasMonedas = coinCont - item.precio;
-      await setDoc(
-        doc(db, 'usuarios', user.uid),
-        { monedas: nuevasMonedas },
-        { merge: true }
-      );
-
-      // Actualiza el estado local
-      setCoinCont(nuevasMonedas);
-      setAdquisiciones([...adquisiciones, item.id]);
-    } catch (error) {
-      console.error('Error al realizar la compra:', error);
+  try {
+    if (coinCont < item.precio) {
+      setMensajeError('No tienes suficientes monedas para comprar este cosmético.');
+      return; // The useEffect will handle showing and hiding the message
     }
-  };
+
+    await setDoc(
+      doc(db, 'adquisiciones', `${user.uid}_${item.id}`),
+      {
+        usuario: user.uid,
+        cosmetico: {
+          id: item.id,
+          nombre: item.nombre,
+          tipo: item.tipo,
+          imagen: item.imagen,
+          precio: item.precio,
+        },
+        fecha: new Date().toISOString(),
+      },
+      { merge: true }
+    );
+
+    const nuevasMonedas = coinCont - item.precio;
+    await setDoc(
+      doc(db, 'usuarios', user.uid),
+      { monedas: nuevasMonedas },
+      { merge: true }
+    );
+
+    setCoinCont(nuevasMonedas);
+    setAdquisiciones([...adquisiciones, item.id]);
+    setMensajeError(''); // Clear error on successful purchase
+    setMostrarMensajeError(false); // Hide the message immediately
+  } catch (error) {
+    console.error('Error al realizar la compra:', error);
+    setMensajeError('Ocurrió un error al procesar la compra.');
+  }
+};
 
   return (
     <div className="modal-overlay">
       <div className="modal-content">
-        <button className="close-button" onClick={onClose}>X</button>
+        <button className="close-button" onClick={onClose}>✖</button>
         {user ? (
           <>
             <div className="current-user-coins">
               Monedas: {coinCont}
             </div>
             <h2 className="modal-title">Tienda de Cosméticos</h2>
+            {/* Apply the class for transition */}
+            <div className={`mensaje-error ${mostrarMensajeError ? 'show' : ''}`}>
+              {mensajeError}
+            </div>
             <nav className="modal-nav">
               {Object.keys(cosmeticosPorTipo).map((categoria) => (
                 <button
