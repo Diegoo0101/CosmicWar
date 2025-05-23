@@ -54,6 +54,8 @@ export default class GameScene extends Phaser.Scene {
     this.muteButton = null;
     // Determina si el sonido está muteado
     this.isMuted = false;
+    // Determina el ángulo de rotación del patrón de disparo del jefe
+    this.bossAngleOffset = 0;
   }
 
   create() {
@@ -158,7 +160,6 @@ export default class GameScene extends Phaser.Scene {
     this.oleada1_2 = this.sound.add('oleada1-2');
     this.oleada10 = this.sound.add('oleada10');
     this.oleada20 = this.sound.add('oleada20');
-
 
     // Cooldown de disparos del jefe
     this.bossShootCooldown = 0;
@@ -632,6 +633,7 @@ export default class GameScene extends Phaser.Scene {
     this.currentWave = 0;
     this.bossActive = false;
     this.grayscaleApplied = false;
+    this.bossAngleOffset = 0;
 
     // Limpia grupos de enemigos, balas, etc.
     this.enemies.clear(true, true);
@@ -945,10 +947,10 @@ export default class GameScene extends Phaser.Scene {
     // Barra de vida del jefe y nombre
     this.jefeText = this.add.text(this.scale.width/2, 585, 'Jefe Alienígena', {
       fontFamily: '"Press Start 2P"',
-      fontSize: '12px',
+      fontSize: '14px',
       fill: '#fff',
       stroke: '#000000',
-      strokeThickness: 1
+      strokeThickness: 3
     }).setOrigin(0.5);
     this.jefeText.setDepth(999);
     this.bossHealthBar = this.add.graphics();
@@ -962,35 +964,34 @@ export default class GameScene extends Phaser.Scene {
     this.physics.add.overlap(this.player, this.boss, this.handlePlayerEnemyCollision, null, this);
   }
 
-  // Maneja disparos del jefe
   bossShoot(boss) {
-    if (!boss.active || this.isPlayerDead) return;
-    this.disparoSFX.play();
-    const numBullets = 18;
-    const speed = this.slowTime ? 60 : 200 + (this.currentWave * 2);
-    const radius = 24;
+  if (!boss.active || this.isPlayerDead) return;
 
-    for (let i = 0; i < numBullets; i++) {
-      // Calcula ángulo para cada bala
-      const angle = (i / numBullets) * Math.PI * 2;
+  this.disparoSFX.play();
 
-      // Calcula posiciones de la bala
-      const x = boss.x + radius * Math.cos(angle);
-      const y = boss.y + radius * Math.sin(angle);
+  const numBullets = 18;
+  const speed = this.slowTime ? 60 : 200 + (this.currentWave * 2);
+  const radius = 24;
+  this.bossAngleOffset += 1;
 
-      // Calcula velocidades de la bala
-      const velocityX = speed * Math.cos(angle);
-      const velocityY = speed * Math.sin(angle);
+  for (let i = 0; i < numBullets; i++) {
+    const angle = this.bossAngleOffset + (i / numBullets) * Math.PI * 2;
 
-      // Crea las balas y las dispara
-      const bullet = this.enemyBullets.create(x, y, 'enemybullet');
-      bullet.setScale(0.15);
-      bullet.setVelocityX(velocityX);
-      bullet.setVelocityY(velocityY);
-      const angleSprite = Math.atan2(velocityY, velocityX);
-      bullet.setAngle(Phaser.Math.RadToDeg(angleSprite) - 90);
-    }
+    const x = boss.x + radius * Math.cos(angle);
+    const y = boss.y + radius * Math.sin(angle);
+
+    const velocityX = speed * Math.cos(angle);
+    const velocityY = speed * Math.sin(angle);
+
+    const bullet = this.enemyBullets.create(x, y, 'enemybullet');
+    bullet.setScale(0.15);
+    bullet.setVelocityX(velocityX);
+    bullet.setVelocityY(velocityY);
+
+    const angleSprite = Math.atan2(velocityY, velocityX);
+    bullet.setAngle(Phaser.Math.RadToDeg(angleSprite) - 90);
   }
+}
 
   // Maneja colisiones de balas con el jefe
   handleBulletBossCollision(boss, bullet) {
