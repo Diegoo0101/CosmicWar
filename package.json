@@ -12,6 +12,7 @@
   "dependencies": {
     "firebase": "^11.6.1",
     "phaser": "^3.88.2",
+    "phaser3-rex-plugins": "^1.80.15",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
     "react-router-dom": "^7.5.2",

@@ -249,4 +249,60 @@
     padding: 8px;
     font-size: 0.9rem;
   }
+
+ 
+  .contact-page-container {
+    padding: 2rem 1rem;
+  }
+
+  .contact-content-wrapper {
+    flex-direction: column;
+    padding: 20px;
+    gap: 20px;
+  }
+
+  .contact-info-left,
+  .contact-form-right {
+    padding: 10px;
+    min-width: unset;
+    width: 100%;
+  }
+
+  .contact-info-left h2,
+  .contact-form-right h2 {
+    font-size: 1.8em;
+    margin-bottom: 15px;
+  }
+
+  .contact-info-left p {
+    font-size: 1em;
+    margin-bottom: 10px;
+  }
+
+  .contact-email {
+    font-size: 1.1em;
+    margin: 15px 0;
+  }
+
+  .contact-form label {
+    font-size: 0.95em;
+    margin-bottom: 5px;
+  }
+
+  .contact-form input[type="text"],
+  .contact-form input[type="email"],
+  .contact-form textarea {
+    padding: 10px;
+    font-size: 0.9em;
+  }
+
+  .contact-form textarea {
+    min-height: 100px;
+  }
+
+  .submit-button {
+    font-size: 1em;
+    padding: 10px 20px;
+    max-width: 200px;
+  }
 }

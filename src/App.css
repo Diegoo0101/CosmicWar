@@ -50,7 +50,7 @@ p, li, span, button, a, div {
   text-shadow: 0 0 8px rgba(100, 255, 218, 0.4);
 }
 
-.navbar-title:hover {
+.navbar-title:hover, .contact-email:hover {
   color: #CCFFF3;
   text-shadow: 0 0 12px rgba(204, 255, 243, 0.6);
 }
@@ -66,7 +66,7 @@ p, li, span, button, a, div {
 
 /* Apartados del menú de navegación */
 .navbar-links li .link-button,
-.footer-links li .link-button {
+.footer-links li .link-button, .link-button {
   color: #94A3B8;
   text-decoration: none;
   padding: 0.7rem 1.4rem;
@@ -81,7 +81,7 @@ p, li, span, button, a, div {
 }
 
 .navbar-links li .link-button:hover,
-.footer-links li .link-button:hover {
+.footer-links li .link-button:hover, .link-button:hover {
   color: #E2E8F0;
 }
 
@@ -330,7 +330,7 @@ p, li, span, button, a, div {
   filter: drop-shadow(0 0 3px rgba(255, 255, 255, 0.1));
 }
 
-.volver-btn {
+.volver-btn, .submit-button {
   display: inline-block;
   margin-top: 45px;
   padding: 14px 30px;
@@ -344,9 +344,10 @@ p, li, span, button, a, div {
   transition: background 0.3s ease, transform 0.2s ease, box-shadow 0.3s ease, color 0.3s ease;
   box-shadow: 0 5px 12px rgba(0, 0, 0, 0.4);
   font-weight: 600;
+  cursor: pointer;
 }
 
-.volver-btn:hover {
+.volver-btn:hover, .submit-button:hover {
   background-color: #64FFDA;
   color: #0A192F;
   transform: translateY(-3px);
@@ -360,14 +361,15 @@ p, li, span, button, a, div {
   left: 0;
   width: 100%;
   height: 100%;
-  background: rgba(0, 0, 0, 0.85);
   display: flex;
   justify-content: center;
   align-items: center;
   z-index: 1000;
   color: #E2E8F0;
   backdrop-filter: blur(6px);
+  background-color: rgba(0, 0, 0, 0.4);
   animation: fadeIn 0.2s ease-out;
+  
 }
 
 .modal-content {
@@ -559,106 +561,103 @@ p, li, span, button, a, div {
 
 /* Google Auth Button */
 .user-info {
-  display: flex;
-  gap: 12px;
-  position: relative;
+  position: relative; /* CRÍTICO: Esto hace que .user-menu se posicione en relación a este contenedor */
+  display: flex; /* O como lo tengas para alinear el user-header y logout-button */
   align-items: center;
+  gap: 10px; /* Espacio entre el user-header y el logout-button */
+  /* Otros estilos que ya tengas para .user-info */
 }
 
+/* El área clickeable que muestra/oculta el menú */
 .user-header {
   display: flex;
   align-items: center;
-  gap: 10px;
   cursor: pointer;
-  padding: 6px 12px;
-  border-radius: 20px;
+  padding: 5px 10px; /* Añade un padding para que el área clickeable sea más grande */
+  border-radius: 8px; /* O el borde que quieras */
   transition: background-color 0.3s ease;
 }
 
 .user-header:hover {
-    background-color: rgba(100, 255, 218, 0.1);
+  background-color: rgba(92, 123, 124, 0.2); /* Un ligero hover para indicar que es clickeable */
 }
 
+/* La imagen de perfil en el header */
 .user-photo {
-  width: 40px;
+  width: 40px; /* Tamaño de la imagen del perfil en el header */
   height: 40px;
   border-radius: 50%;
-  object-fit: cover;
+  margin-right: 10px;
   border: 2px solid #64FFDA;
-  box-shadow: 0 0 8px rgba(100, 255, 218, 0.6);
-  transition: transform 0.2s ease;
 }
 
-.user-photo:hover {
-  transform: scale(1.08);
-}
-
+/* El nombre de usuario en el header */
 .user-name {
-  font-size: 1rem;
-  color: #E2E8F0;
-  white-space: nowrap;
-  font-weight: 500;
+  font-weight: bold;
+  color: #64FFDA;
 }
 
+
+/* EL MENÚ DESPLEGABLE DEL USUARIO */
 .user-menu {
   position: absolute;
-  top: calc(100% + 15px);
-  right: 0;
-  background: #0B2447;
-  border: 1px solid #64FFDA;
-  border-radius: 10px;
-  padding: 20px;
-  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.5);
-  z-index: 1000;
-  width: 220px;
+  top: 100%; /* CRÍTICO: Despliega justo debajo del .user-header */
+  left: 50%; /* CRÍTICO: Centra el menú horizontalmente */
+  transform: translateX(-50%); /* CRÍTICO: Ajusta el centro del menú a la mitad del elemento padre */
+  background-color: #0B2447; /* Color de fondo del menú */
+  border: 1px solid #5C7B7C;
+  border-radius: 8px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
+  padding: 15px;
+  min-width: 200px; /* Ancho mínimo para el menú */
   display: flex;
   flex-direction: column;
-  align-items: center;
-  gap: 10px;
-  animation: fadeIn 0.2s ease-out;
+  align-items: center; /* Centra el contenido dentro del menú */
+  gap: 10px; /* Espacio entre los elementos del menú */
+  z-index: 999; /* Asegúrate de que esté por encima de otros elementos */
+  margin-top: 10px; /* Separación extra entre el header y el menú */
 }
 
+/* Estilos para la foto de perfil grande dentro del menú */
 .user-photo-large {
-  width: 90px;
-  height: 90px;
+  width: 80px;
+  height: 80px;
   border-radius: 50%;
-  margin-bottom: 15px;
   border: 3px solid #64FFDA;
-  box-shadow: 0 0 12px rgba(100, 255, 218, 0.8);
+  margin-bottom: 10px;
 }
 
+/* Estilos para el nombre de usuario grande dentro del menú */
 .user-name-large {
-  text-align: center;
+  font-size: 1.2em;
   font-weight: bold;
-  font-size: 1.2rem;
   color: #64FFDA;
-  margin-bottom: 8px;
+  text-align: center;
 }
 
+/* Estilos para las monedas y puntuación */
 .user-coins,
 .user-score {
-  margin: 4px 0;
-  color: white;
-  font-size: 0.95rem;
+  font-size: 0.95em;
+  color: #ccc;
+  text-align: center;
 }
 
+/* Estilos para el botón de eliminar usuario */
 .delete-button {
-  background: #E74C3C;
-  color: white !important;
+  background-color: #FF6B6B; /* Rojo para eliminar */
+  color: white;
   border: none;
-  padding: 10px 15px;
-  border-radius: 6px;
+  padding: 8px 15px;
+  border-radius: 5px;
   cursor: pointer;
-  width: 100%;
-  margin-top: 15px;
-  font-weight: 600;
-  transition: background 0.3s ease, transform 0.2s ease;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  font-size: 0.9em;
+  transition: background-color 0.3s ease;
+  margin-top: 10px;
 }
 
 .delete-button:hover {
-  background: #C0392B;
-  transform: translateY(-1px);
+  background-color: #FF4F4F;
 }
 
 /* Botón de Google */
@@ -795,4 +794,108 @@ p, li, span, button, a, div {
 
 .navbar-title, .footer-title, .user-name-large, h1, h2, h3 {
   font-family: 'Press Start 2P' !important;
+}
+
+/* Contacto.css */
+.contact-content-wrapper {
+  display: flex;
+  flex-wrap: wrap; /* Permite que los elementos se envuelvan en pantallas pequeñas */
+  gap: 40px; /* Espacio entre las columnas */
+  max-width: 900px;
+  width: 100%;
+  padding: 40px 50px;
+  background-color: #0B2447;
+  border-radius: 12px;
+  box-shadow: 0 0 15px rgba(0, 0, 0, 0.5);
+  border: 1px solid rgba(92, 123, 124, 0.4);
+}
+
+.contact-info-left,
+.contact-form-right {
+  flex: 1; /* Permite que ambos tomen espacio equitativamente */
+  min-width: 300px; /* Ancho mínimo para que no se compriman demasiado */
+  padding: 20px;
+  box-sizing: border-box; /* Incluir padding en el width */
+}
+
+.contact-info-left h2,
+.contact-form-right h2 {
+  font-size: 2.2em;
+  color: #64FFDA;
+  text-shadow: 0 0 8px rgba(100, 255, 218, 0.4);
+  margin-bottom: 20px;
+  text-align: center;
+}
+
+.contact-info-left p {
+  font-size: 1.1em;
+  line-height: 1.6;
+  margin-bottom: 15px;
+  color: #ccc;
+}
+
+.contact-email {
+  font-size: 1.3em;
+  font-weight: bold;
+  color: #64FFDA;
+  text-shadow: 0 0 8px rgba(100, 255, 218, 0.4);
+  text-align: center;
+  margin: 25px 0;
+  word-break: break-all;
+  transition: color 0.3s ease, text-shadow 0.3s ease;
+  text-decoration: none;
+}
+
+.contact-form .form-group {
+  margin-bottom: 20px;
+}
+
+.contact-form label {
+  display: block;
+  margin-bottom: 8px;
+  font-weight: bold;
+  color: #ccc;
+}
+
+.contact-form input[type="text"],
+.contact-form input[type="email"],
+.contact-form textarea {
+  width: 100%;
+  padding: 12px;
+  border: 1px solid #555;
+  border-radius: 5px;
+  background-color: #0A192F;
+  color: #eee;
+  font-size: 1em;
+  box-sizing: border-box;
+  font-family: 'Open Sans', sans-serif;
+}
+
+.contact-form input[type="text"]:focus,
+.contact-form input[type="email"]:focus,
+.contact-form textarea:focus {
+  outline: none;
+  border-color: #64FFDA;
+  box-shadow: 0 0 8px rgba(100, 255, 218, 0.4);
+}
+
+.contact-form textarea {
+  resize: vertical;
+}
+
+/* Modal de contacto */
+.modal-content.success h3 {
+  color: #009b08;
+}
+
+.modal-content.error h3 {
+  color: #E74C3C;
+}
+
+.modal-content.error {
+  border: 2px solid #E74C3C;
+}
+
+.modal-content.success {
+  border: 2px solid #009b08;
 }

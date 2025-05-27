@@ -4,6 +4,7 @@ import './App_movil.css';
 import PhaserGame from './components/PhaserGame';
 import GoogleAuthButton from './components/GoogleAuthButton';
 import ComoJugar from './components/ComoJugar';
+import Contacto from './components/Contacto';
 import ClasificacionModal from './components/ClasificacionModal';
 import TiendaModal from './components/TiendaModal';
 import PersonalizacionModal from './components/PersonalizacionModal';
@@ -35,6 +36,7 @@ function App() {
           <Routes>
             <Route path="/" element={<PhaserGame />} />
             <Route path="/como-jugar" element={<ComoJugar />} />
+            <Route path="/contacto" element={<Contacto/>} />
           </Routes>
         </main>
         <footer className="footer">
@@ -58,6 +60,8 @@ function App() {
                 <img src={instagramIcon} alt="Instagram" className="social-icon"/>
               </a>
             </div>
+            <h3 className="social-title">Contáctanos</h3>
+            <a href="/contacto" className="link-button">Contacto</a>
           </div>
           <p className="copyright-notice">© 2025 CosmicWar. Todos los derechos reservados.</p>
         </footer>
