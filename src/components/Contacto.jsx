@@ -18,71 +18,65 @@ const Contacto = () => {
   };
 
   const handleSubmit = async (e) => {
-  e.preventDefault();
+    e.preventDefault();
 
-  try {
-    // 1. Obtener el token reCAPTCHA
-    const token = await window.grecaptcha.execute('TU_SITE_KEY', { action: 'submit' });
+    try {
+      const response = await fetch(FORMSPREE_ENDPOINT, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json'
+        },
+        body: JSON.stringify(formData)
+      });
 
-    // 2. Agregar token al formData
-    const formDataWithToken = {
-      ...formData,
-      'g-recaptcha-response': token
-    };
+      if (response.ok) {
+        setModalMessage('¡Mensaje enviado con éxito!');
+        setModalType('success');
+        setIsModalOpen(true);
+        setFormData({ name: '', email: '', message: '' }); 
+      } else {
+        
+        const errorData = await response.json();
+        let errorMessage = 'Ha ocurrido un error al enviar el mensaje. Por favor, inténtalo de nuevo.'; 
 
-    const response = await fetch(FORMSPREE_ENDPOINT, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Accept': 'application/json'
-      },
-      body: JSON.stringify(formDataWithToken)
-    });
-
-    if (response.ok) {
-      setModalMessage('¡Mensaje enviado con éxito!');
-      setModalType('success');
-      setIsModalOpen(true);
-      setFormData({ name: '', email: '', message: '' });
-    } else {
-      const errorData = await response.json();
-      let errorMessage = 'Ha ocurrido un error al enviar el mensaje. Por favor, inténtalo de nuevo.';
-
-      if (errorData.errors && errorData.errors.length > 0) {
-        const translatedErrors = errorData.errors.map(err => {
-          switch (err.field) {
-            case 'email':
-              if (err.message === 'should be an email') return 'El correo electrónico no es válido.';
-              if (err.message === 'must be present') return 'El correo electrónico es obligatorio.';
-              break;
-            case 'name':
-              if (err.message === 'must be present') return 'El nombre es obligatorio.';
-              break;
-            case 'message':
-              if (err.message === 'must be present') return 'El mensaje es obligatorio.';
-              break;
-            default:
-              if (err.message.includes('The form has expired')) return 'El formulario ha caducado. Por favor, recarga la página.';
-              if (err.message.includes('Submission limit exceeded')) return 'Has excedido el límite de envíos. Por favor, inténtalo de nuevo más tarde.';
-              return `Error desconocido en el campo ${err.field || ''}: ${err.message}`;
-          }
-          return `Error en el campo ${err.field || ''}: ${err.message}`;
-        });
-        errorMessage = translatedErrors.join(', ');
+        if (errorData.errors && errorData.errors.length > 0) { 
+          const translatedErrors = errorData.errors.map(err => { 
+            switch (err.field) { 
+              case 'email':
+                if (err.message === 'should be an email') return 'El correo electrónico no es válido.'; 
+                if (err.message === 'must be present') return 'El correo electrónico es obligatorio.'; 
+                break;
+              case 'name':
+                if (err.message === 'must be present') return 'El nombre es obligatorio.'; 
+                break;
+              case 'message':
+                if (err.message === 'must be present') return 'El mensaje es obligatorio.'; 
+                break;
+              
+              default:
+                
+                if (err.message.includes('The form has expired')) return 'El formulario ha caducado. Por favor, recarga la página.';
+                if (err.message.includes('Submission limit exceeded')) return 'Has excedido el límite de envíos. Por favor, inténtalo de nuevo más tarde.';
+                return `Error desconocido en el campo ${err.field || ''}: ${err.message}`; 
+            }
+            return `Error en el campo ${err.field || ''}: ${err.message}`; 
+          });
+          errorMessage = translatedErrors.join(', '); 
+        }
+        
+        setModalMessage(`${errorMessage}`); 
+        setModalType('error'); 
+        setIsModalOpen(true); 
       }
-
-      setModalMessage(errorMessage);
+    } catch (error) {
+      
+      setModalMessage('Error de conexión. Por favor, asegúrate de tener conexión a internet y vuelve a intentarlo.');
       setModalType('error');
       setIsModalOpen(true);
+      console.error('Error al enviar el formulario:', error);
     }
-  } catch (error) {
-    setModalMessage('Error de conexión. Por favor, asegúrate de tener conexión a internet y vuelve a intentarlo.');
-    setModalType('error');
-    setIsModalOpen(true);
-    console.error('Error al enviar el formulario:', error);
-  }
-};
-
+  };
 
   const closeModal = () => {
     setIsModalOpen(false); 
