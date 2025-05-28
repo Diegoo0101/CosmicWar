@@ -27,6 +27,11 @@
     align-items: center;
   }
 
+  .column-left,
+  .column-right {
+    display: none;
+  }
+
   .navbar-links li .link-button,
   .footer-links li .link-button,
   .googleBtn {
@@ -38,60 +43,47 @@
 
   .main-content {
     padding: 2rem 1rem;
-    flex-direction: column;
   }
 
-  #phaser-container {
-    width: 95%;
-    max-width: unset;
-  }
- 
+  /* Footer Mobile Adjustments */
   .footer {
     flex-direction: column;
-    padding: 1.5rem 1rem;
     align-items: center;
-    min-height: unset;
-    padding-bottom: 5rem;
+    text-align: center;
+    padding: 1.5rem 1rem;
+    gap: 1.5rem;
   }
 
   .footer-title {
-    font-size: 1.8rem;
-    margin-bottom: 1rem;
-    text-align: center;
-    flex-basis: auto;
-    width: 100%;
+    font-size: 2rem;
+    margin-bottom: 0.5rem;
+    align-self: center;
   }
 
   .footer-links {
     flex-direction: column;
     align-items: center;
-    margin: 1rem 0;
-    flex-basis: auto;
+    gap: 0.8rem;
     width: 100%;
   }
 
   .footer-links li {
-    margin-bottom: 0.5rem;
-  }
-
-  .footer-links li:last-child {
-    margin-bottom: 0;
+    width: auto;
   }
 
   .footer-social {
     align-items: center;
-    margin-top: 1.5rem;
-    flex-basis: auto;
-    width: 100%;
+    margin-bottom: 1.5rem;
   }
 
-  .footer-social h3 {
-    font-size: 1rem;
+  .social-title, .legal-title {
+    font-size: 1.1rem;
     margin-bottom: 0.8rem;
   }
 
   .social-icons {
-    gap: 15px;
+    justify-content: center;
+    gap: 10px;
   }
 
   .social-icon {
@@ -99,129 +91,66 @@
     height: 28px;
   }
 
-  .copyright-notice {
-    position: absolute;
-    bottom: 1rem;
-    left: 0;
-    right: 0;
-    font-size: 0.75rem;
-    padding-top: 0.8rem;
-    margin-top: 1.5rem;
+  .footer-legal {
+    flex-direction: column;
+    align-items: center;
+    gap: 0.8rem;
+    width: 100%;
+    margin-bottom: 1.5rem;
   }
 
- 
+  .footer-legal a {
+    font-size: 0.9rem;
+    padding: 0.4rem 0.8rem;
+  }
+
+  .copyright-notice {
+    font-size: 0.8rem;
+    margin-top: 1rem;
+    text-align: center;
+    width: 100%;
+  }
+
+  /* Other mobile adjustments */
   .modal-overlay {
     padding: 1rem;
   }
 
   .modal-content {
     width: 95%;
-    max-width: 95%;
-    margin: 0 auto;
-    padding: 20px;
-    top: 50%;
-    transform: translate(-50%, -50%);
-    left: 50%;
+    max-width: 500px;
+    padding: 1.5rem 1rem;
+    max-height: 85vh;
   }
 
   .close-button {
-    font-size: 1.5rem;
+    font-size: 1.8rem;
     right: 10px;
     top: 10px;
   }
 
   .modal-title {
     font-size: 1.8rem;
-    margin-bottom: 15px;
+    margin-bottom: 1rem;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
   }
 
-  .modal-nav {
-    flex-direction: column;
-    gap: 8px;
-    margin-bottom: 15px;
-  }
-
-  .nav-button {
-    padding: 8px 12px;
-    font-size: 0.9rem;
-    width: 100%;
-  }
-
-  .cosmeticos-list {
-    grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
-    gap: 15px;
-    max-height: 350px;
-  }
-
-  .cosmetico-item {
-    padding: 10px;
-    font-size: 0.85rem;
-  }
-
-  .cosmetico-img {
-    width: 60px;
-    height: 60px;
-  }
-
-  .cosmetico-item button {
-    padding: 6px 10px;
-    font-size: 0.8rem;
-  }
-
-  .agotado-text {
-    font-size: 0.8rem;
-  }
-
-  .current-user-coins {
-    font-size: 1rem;
-    margin-bottom: 15px;
-  }
-
-  .personalizacion-content {
-    max-width: 95%;
-    padding: 20px;
-  }
-
-  .personalizacion-nav {
-    flex-direction: column;
-    gap: 8px;
-  }
-
+  .leaderboard-list,
+  .cosmeticos-list,
   .personalizacion-list {
-    grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
-    gap: 15px;
-    max-height: 300px;
+    font-size: 0.9rem;
   }
 
+  .leaderboard-item,
+  .cosmetico-item,
   .personalizacion-item {
-    padding: 8px;
+    padding: 8px 12px;
   }
 
-  .personalizacion-item img {
-    width: 50px;
-    height: 50px;
-  }
-
-  .personalizacion-item button {
-    padding: 5px 8px;
-    font-size: 0.75rem;
-  }
-
- 
-  .leaderboard-content {
-    max-width: 90%;
-    padding: 20px;
-    border-width: 1px;
-    box-shadow: 0 0 20px rgba(0, 0, 0, 0.6);
-  }
-
-  .leaderboard-list {
-    margin-top: 15px;
-    padding: 10px;
-  }
-
-  .leaderboard-list li {
-    font-size: 1rem;
+  .buy-button,
+  .select-button {
+    font-size: 0.8rem;
     padding: 6px 10px;
     margin: 8px 0;
   }
@@ -243,14 +172,13 @@
   .personalizacion-list::-webkit-scrollbar-thumb {
     border-radius: 3px;
   }
- 
+
   .mensaje-error {
     margin: 8px 0;
     padding: 8px;
     font-size: 0.9rem;
   }
 
- 
   .contact-page-container {
     padding: 2rem 1rem;
   }
@@ -271,12 +199,10 @@
   .contact-info-left h2,
   .contact-form-right h2 {
     font-size: 1.8em;
-    margin-bottom: 15px;
   }
 
   .contact-info-left p {
-    font-size: 1em;
-    margin-bottom: 10px;
+    font-size: 0.95em;
   }
 
   .contact-email {
@@ -285,8 +211,7 @@
   }
 
   .contact-form label {
-    font-size: 0.95em;
-    margin-bottom: 5px;
+    font-size: 0.9em;
   }
 
   .contact-form input[type="text"],
@@ -300,9 +225,8 @@
     min-height: 100px;
   }
 
-  .submit-button {
-    font-size: 1em;
+  .contact-form button {
     padding: 10px 20px;
-    max-width: 200px;
+    font-size: 1em;
   }
 }

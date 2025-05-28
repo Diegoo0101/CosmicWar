@@ -1,4 +1,3 @@
-/* General */
 body, html, #root {
   margin: 0;
   padding: 0;
@@ -25,7 +24,6 @@ p, li, span, button, a, div {
   overflow: hidden;
 }
 
-/* Menú de navegación */
 .navbar {
   display: flex;
   justify-content: space-between;
@@ -64,7 +62,7 @@ p, li, span, button, a, div {
   align-items: center;
 }
 
-/* Apartados del menú de navegación */
+
 .navbar-links li .link-button,
 .footer-links li .link-button, .link-button {
   color: #94A3B8;
@@ -85,7 +83,6 @@ p, li, span, button, a, div {
   color: #E2E8F0;
 }
 
-/* Contenido principal */
 .main-content {
   flex-grow: 1;
   display: flex;
@@ -95,7 +92,7 @@ p, li, span, button, a, div {
   padding: 5rem 10rem;
 }
 
-/* Contenedor del juego */
+
 #phaser-container {
   border: 4px solid #64FFDA;
   border-radius: 15px;
@@ -111,116 +108,122 @@ p, li, span, button, a, div {
   box-shadow: 0 0 35px rgba(204, 255, 243, 0.9);
 }
 
-/* Footer */
 .footer {
-  background-color: #0B2447;
-  padding: 2rem 4.5rem;
-  color: #E2E8F0;
   display: flex;
-  flex-wrap: wrap;
   justify-content: space-between;
   align-items: flex-start;
-  min-height: 140px;
+  flex-wrap: wrap;
+  background-color: #0B2447;
+  padding: 2.5rem 4.5rem 1rem;
   box-shadow: 0 -4px 10px rgba(0, 0, 0, 0.4);
   border-top: 2px solid #5C7B7C;
-  position: relative;
-  padding-bottom: 4rem;
+  color: #E2E8F0;
+  gap: 20px;
 }
 
 .footer-title {
   font-family: 'Montserrat', sans-serif;
   font-size: 2rem;
   font-weight: 700;
-  text-decoration: none;
   color: #64FFDA;
-  align-self: flex-start;
-  letter-spacing: 0.8px;
-  transition: color 0.3s ease, text-shadow 0.3s ease;
-  text-shadow: 0 0 7px rgba(100, 255, 218, 0.3);
-  flex-basis: 20%;
-  text-align: left;
-}
-
-.footer-title:hover {
-  color: #CCFFF3;
-  text-shadow: 0 0 10px rgba(204, 255, 243, 0.5);
+  text-decoration: none;
+  margin-bottom: 1rem;
+  white-space: nowrap;
 }
 
 .footer-links {
   list-style: none;
+  padding: 0;
+  margin: 0;
   display: flex;
   flex-direction: column;
-  gap: 12px;
-  padding: 0;
-  flex-basis: 35%;
-  align-items: center; 
-  text-align: center;
-  margin: 0 auto;
+  gap: 10px;
 }
 
 .footer-links li {
-    width: 100%;
-}
-
-.footer-links li .link-button {
-    width: 100%;
-    text-align: center;
+  margin-bottom: 0;
 }
 
 .footer-social {
   display: flex;
   flex-direction: column;
-  align-items: flex-end;
-  gap: 15px;
-  flex-basis: 20%;
+  align-items: flex-start;
 }
 
-.social-title {
-  text-shadow: 0 0 7px rgba(100, 255, 218, 0.3);
-}
-
-.footer-social h3 {
-  font-family: 'Montserrat', sans-serif;
+.social-title, .legal-title {
   font-size: 1.2rem;
   color: #64FFDA;
-  margin: 0;
-  font-weight: 600;
-  text-shadow: 0 0 6px rgba(100, 255, 218, 0.3);
+  margin-bottom: 10px;
 }
 
 .social-icons {
   display: flex;
-  gap: 20px;
+  gap: 15px;
 }
 
 .social-icon {
-  width: 32px;
-  height: 32px;
-  object-fit: contain;
-  transition: transform 0.2s ease-in-out, filter 0.2s ease-in-out;
-  filter: grayscale(100%) brightness(150%) opacity(0.8);
+  width: 30px;
+  height: 30px;
+  filter: grayscale(100%) brightness(120%);
+  transition: filter 0.3s ease, transform 0.3s ease;
 }
 
 .social-icon:hover {
-  transform: translateY(-3px) scale(1.1);
-  filter: grayscale(0%) brightness(100%) opacity(1);
+  filter: grayscale(0%) brightness(100%);
+  transform: scale(1.1);
 }
+
+.footer-legal {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 10px;
+ 
+}
+
+.footer-legal a {
+ 
+  display: inline-block;
+  margin: 0;
+  padding: 0;
+ 
+ 
+  font-size: 0.95rem;
+}
+
 
 .copyright-notice {
-  position: absolute;
-  bottom: 1.5rem;
-  left: 0;
-  right: 0;
-  width: 100%; /* Take full width */
+  width: 100%;
   text-align: center;
-  font-size: 0.9rem;
-  color: #94A3B8;
-  border-top: 1px solid rgba(92, 123, 124, 0.4);
+  margin-top: 1rem;
   padding-top: 1rem;
-  height: 1rem;
+  border-top: solid #566984 1px;
+  font-size: 0.9rem;
+  color: #A0AEC0;
+  margin-bottom: 0;
 }
 
-/* Cómo jugar */
+
+.link-button {
+  background-color: transparent;
+  border: none;
+  color: #A0AEC0;
+  padding: 0.5rem 1rem;
+  text-decoration: none;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: color 0.3s ease, transform 0.3s ease;
+  white-space: nowrap;
+  display: inline-block;
+}
+
+.link-button:hover {
+  color: rgb(223, 229, 238);
+  transform: translateY(-2px);
+}
+
+
+
 .como-jugar-layout {
   display: flex;
   width: 100%;
@@ -354,7 +357,7 @@ p, li, span, button, a, div {
   box-shadow: 0 8px 16px rgba(0, 0, 0, 0.5);
 }
 
-/* Modal general */
+
 .modal-overlay {
   position: fixed;
   top: 0;
@@ -388,7 +391,7 @@ p, li, span, button, a, div {
   flex-direction: column;
 }
 
-/* Botones de cerrar modal y cerrar sesión, e info de usuario */
+
 .close-button,
 .logout-button {
   position: absolute;
@@ -432,7 +435,7 @@ p, li, span, button, a, div {
   text-shadow: 0 0 10px rgba(100, 255, 218, 0.5);
 }
 
-/* Tienda y Personalización */
+
 .current-user-coins {
   font-size: 1rem;
   text-align: left;
@@ -548,77 +551,72 @@ p, li, span, button, a, div {
 
 .mensaje-error {
   color: #e74c3c;
-  padding: 10px;
-  margin: 10px 0;
   text-align: center;
   opacity: 0;
-  transition: opacity 1s ease-out;
+  padding: 0;
+  margin: 0;
+  transition: opacity 1s ease-out, padding 1s ease-out, margin 1s ease-out;
 }
 
 .mensaje-error.show {
   opacity: 1;
+  padding: 10px;
+  margin: 10px 0;
 }
 
-/* Google Auth Button */
+
 .user-info {
-  position: relative; /* CRÍTICO: Esto hace que .user-menu se posicione en relación a este contenedor */
-  display: flex; /* O como lo tengas para alinear el user-header y logout-button */
+  position: relative;
+  display: flex;
   align-items: center;
-  gap: 10px; /* Espacio entre el user-header y el logout-button */
-  /* Otros estilos que ya tengas para .user-info */
+  gap: 10px;
 }
 
-/* El área clickeable que muestra/oculta el menú */
 .user-header {
   display: flex;
   align-items: center;
   cursor: pointer;
-  padding: 5px 10px; /* Añade un padding para que el área clickeable sea más grande */
-  border-radius: 8px; /* O el borde que quieras */
+  padding: 5px 10px;
+  border-radius: 8px;
   transition: background-color 0.3s ease;
 }
 
 .user-header:hover {
-  background-color: rgba(92, 123, 124, 0.2); /* Un ligero hover para indicar que es clickeable */
+  background-color: rgba(92, 123, 124, 0.2);
 }
 
-/* La imagen de perfil en el header */
 .user-photo {
-  width: 40px; /* Tamaño de la imagen del perfil en el header */
+  width: 40px;
   height: 40px;
   border-radius: 50%;
   margin-right: 10px;
   border: 2px solid #64FFDA;
 }
 
-/* El nombre de usuario en el header */
 .user-name {
   font-weight: bold;
   color: #64FFDA;
 }
 
-
-/* EL MENÚ DESPLEGABLE DEL USUARIO */
 .user-menu {
   position: absolute;
-  top: 100%; /* CRÍTICO: Despliega justo debajo del .user-header */
-  left: 50%; /* CRÍTICO: Centra el menú horizontalmente */
-  transform: translateX(-50%); /* CRÍTICO: Ajusta el centro del menú a la mitad del elemento padre */
-  background-color: #0B2447; /* Color de fondo del menú */
+  top: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  background-color: #0B2447;
   border: 1px solid #5C7B7C;
   border-radius: 8px;
   box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
   padding: 15px;
-  min-width: 200px; /* Ancho mínimo para el menú */
+  min-width: 200px;
   display: flex;
   flex-direction: column;
-  align-items: center; /* Centra el contenido dentro del menú */
-  gap: 10px; /* Espacio entre los elementos del menú */
-  z-index: 999; /* Asegúrate de que esté por encima de otros elementos */
-  margin-top: 10px; /* Separación extra entre el header y el menú */
+  align-items: center;
+  gap: 10px;
+  z-index: 999;
+  margin-top: 10px;
 }
 
-/* Estilos para la foto de perfil grande dentro del menú */
 .user-photo-large {
   width: 80px;
   height: 80px;
@@ -627,7 +625,6 @@ p, li, span, button, a, div {
   margin-bottom: 10px;
 }
 
-/* Estilos para el nombre de usuario grande dentro del menú */
 .user-name-large {
   font-size: 1.2em;
   font-weight: bold;
@@ -635,7 +632,6 @@ p, li, span, button, a, div {
   text-align: center;
 }
 
-/* Estilos para las monedas y puntuación */
 .user-coins,
 .user-score {
   font-size: 0.95em;
@@ -643,9 +639,8 @@ p, li, span, button, a, div {
   text-align: center;
 }
 
-/* Estilos para el botón de eliminar usuario */
 .delete-button {
-  background-color: #FF6B6B; /* Rojo para eliminar */
+  background-color: #FF6B6B;
   color: white;
   border: none;
   padding: 8px 15px;
@@ -660,7 +655,6 @@ p, li, span, button, a, div {
   background-color: #FF4F4F;
 }
 
-/* Botón de Google */
 .googleBtn {
   display: flex;
   align-items: center;
@@ -688,8 +682,6 @@ p, li, span, button, a, div {
   height: 20px;
 }
 
-
-/* Tabla de Clasificación */
 .leaderboard-overlay {
   position: fixed;
   top: 0;
@@ -796,11 +788,11 @@ p, li, span, button, a, div {
   font-family: 'Press Start 2P' !important;
 }
 
-/* Contacto.css */
+
 .contact-content-wrapper {
   display: flex;
-  flex-wrap: wrap; /* Permite que los elementos se envuelvan en pantallas pequeñas */
-  gap: 40px; /* Espacio entre las columnas */
+  flex-wrap: wrap;
+  gap: 40px;
   max-width: 900px;
   width: 100%;
   padding: 40px 50px;
@@ -812,10 +804,10 @@ p, li, span, button, a, div {
 
 .contact-info-left,
 .contact-form-right {
-  flex: 1; /* Permite que ambos tomen espacio equitativamente */
-  min-width: 300px; /* Ancho mínimo para que no se compriman demasiado */
+  flex: 1;
+  min-width: 300px;
   padding: 20px;
-  box-sizing: border-box; /* Incluir padding en el width */
+  box-sizing: border-box;
 }
 
 .contact-info-left h2,
@@ -883,7 +875,7 @@ p, li, span, button, a, div {
   resize: vertical;
 }
 
-/* Modal de contacto */
+
 .modal-content.success h3 {
   color: #009b08;
 }
@@ -898,4 +890,13 @@ p, li, span, button, a, div {
 
 .modal-content.success {
   border: 2px solid #009b08;
+}
+
+.legal-container h1, .legal-container h2 {
+  font-family: 'Open Sans', sans-serif !important;
+  font-weight: bold;
+}
+
+.legal-container a {
+  color: white;
 }

@@ -5,6 +5,8 @@ import PhaserGame from './components/PhaserGame';
 import GoogleAuthButton from './components/GoogleAuthButton';
 import ComoJugar from './components/ComoJugar';
 import Contacto from './components/Contacto';
+import Terminos from './components/Terminos';
+import Privacidad from './components/Privacidad';
 import ClasificacionModal from './components/ClasificacionModal';
 import TiendaModal from './components/TiendaModal';
 import PersonalizacionModal from './components/PersonalizacionModal';
@@ -37,34 +39,48 @@ function App() {
             <Route path="/" element={<PhaserGame />} />
             <Route path="/como-jugar" element={<ComoJugar />} />
             <Route path="/contacto" element={<Contacto/>} />
+            <Route path="/terminos" element={<Terminos/>} />
+            <Route path="/privacidad" element={<Privacidad/>} />
           </Routes>
         </main>
         <footer className="footer">
-          <Link to="/" className="footer-title">CosmicWar</Link>
-          <ul className="footer-links">
-            <li><a href="/como-jugar" className="link-button">Cómo jugar</a></li>
-            <li><button onClick={() => setIsShopOpen(true)} className="link-button">Tienda</button></li>
-            <li><button onClick={() => setIsPersonalizationOpen(true)} className="link-button">Personalización</button></li>
-            <li><button onClick={() => setIsLeaderboardOpen(true)} className="link-button">Tabla de clasificación</button></li>
-          </ul>
-          <div className="footer-social">
-            <h3 className="social-title">Síguenos</h3>
-            <div className="social-icons">
-              <a href="https://twitter.com" target="_blank" rel="noopener noreferrer">
-                <img src={twitterIcon} alt="Twitter" className="social-icon"/>
-              </a>
-              <a href="https://facebook.com" target="_blank" rel="noopener noreferrer">
-                <img src={facebookIcon} alt="Facebook" className="social-icon"/>
-              </a>
-              <a href="https://instagram.com" target="_blank" rel="noopener noreferrer">
-                <img src={instagramIcon} alt="Instagram" className="social-icon"/>
-              </a>
-            </div>
-            <h3 className="social-title">Contáctanos</h3>
-            <a href="/contacto" className="link-button">Contacto</a>
-          </div>
-          <p className="copyright-notice">© 2025 CosmicWar. Todos los derechos reservados.</p>
-        </footer>
+  <Link to="/" className="footer-title">CosmicWar</Link>
+
+  <ul className="footer-links">
+    <li><a href="/como-jugar" className="link-button">Cómo jugar</a></li>
+    <li><button onClick={() => setIsShopOpen(true)} className="link-button">Tienda</button></li>
+    <li><button onClick={() => setIsPersonalizationOpen(true)} className="link-button">Personalización</button></li>
+    <li><button onClick={() => setIsLeaderboardOpen(true)} className="link-button">Tabla de clasificación</button></li>
+  </ul>
+
+  <div className="footer-social">
+    <h3 className="social-title">Síguenos</h3>
+    <div className="social-icons">
+      <a href="https://twitter.com" target="_blank" rel="noopener noreferrer">
+        <img src={twitterIcon} alt="Twitter" className="social-icon" />
+      </a>
+      <a href="https://facebook.com" target="_blank" rel="noopener noreferrer">
+        <img src={facebookIcon} alt="Facebook" className="social-icon" />
+      </a>
+      <a href="https://instagram.com" target="_blank" rel="noopener noreferrer">
+        <img src={instagramIcon} alt="Instagram" className="social-icon" />
+      </a>
+    </div>
+    <h3 className="social-title">Contáctanos</h3>
+    <a href="/contacto" className="link-button">Contacto</a>
+  </div>
+
+  <div className="footer-legal">
+    <h3 className="legal-title">Legal</h3>
+    <a href="/terminos" className="link-button">Términos y Condiciones</a>
+    <a href="/privacidad" className="link-button">Política de Privacidad</a>
+  </div>
+
+  <p className="copyright-notice">
+    © 2025 CosmicWar. Todos los derechos reservados.
+  </p>
+</footer>
+
 
         <TiendaModal isOpen={isShopOpen} onClose={() => setIsShopOpen(false)} />
         <PersonalizacionModal isOpen={isPersonalizationOpen} onClose={() => setIsPersonalizationOpen(false)} />
