@@ -638,6 +638,7 @@ p, li, span, button, a, div {
   font-size: 0.95em;
   color: #ccc;
   text-align: center;
+  margin: 0;
 }
 
 .delete-button {
