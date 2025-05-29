@@ -368,6 +368,7 @@ export default class GameScene extends Phaser.Scene {
 
   // Hace que el jugador haga el disparo especial
   specialShot() {
+    if(this.isPlayerDead) return;
     // Comprueba que el jugador tenga suficiente poder especial
     if (this.contFires >= 3) {
       // Vacía el poder especial
