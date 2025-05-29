@@ -902,3 +902,236 @@ p, li, span, button, a, div {
 .legal-container a {
   color: white;
 }
+
+@media (max-width: 768px) {
+  .navbar {
+    flex-direction: column;
+    align-items: flex-start;
+    padding: 1rem;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
+  }
+
+  .navbar-title {
+    font-size: 1.8rem;
+    margin-bottom: 0.8rem;
+    align-self: center;
+  }
+
+  .navbar-links {
+    flex-direction: column;
+    gap: 0.8rem;
+    width: 100%;
+    align-items: center;
+  }
+
+  .navbar-links li {
+    width: 100%;
+    text-align: center;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+
+  .column-left,
+  .column-right {
+    display: none;
+  }
+
+  .navbar-links li .link-button,
+  .footer-links li .link-button,
+  .googleBtn {
+    font-size: 0.95rem;
+    padding: 0.6rem 1.2rem;
+    width: 90%;
+    max-width: 250px;
+  }
+
+  .main-content {
+    padding: 2rem 1rem;
+  }
+
+  /* Footer Mobile Adjustments */
+  .footer {
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    padding: 1.5rem 1rem;
+    gap: 1.5rem;
+  }
+
+  .footer-title {
+    font-size: 2rem;
+    margin-bottom: 0.5rem;
+    align-self: center;
+  }
+
+  .footer-links {
+    flex-direction: column;
+    align-items: center;
+    gap: 0.8rem;
+    width: 100%;
+  }
+
+  .footer-links li {
+    width: auto;
+  }
+
+  .footer-social {
+    align-items: center;
+    margin-bottom: 1.5rem;
+  }
+
+  .social-title, .legal-title {
+    font-size: 1.1rem;
+    margin-bottom: 0.8rem;
+  }
+
+  .social-icons {
+    justify-content: center;
+    gap: 10px;
+  }
+
+  .social-icon {
+    width: 28px;
+    height: 28px;
+  }
+
+  .footer-legal {
+    flex-direction: column;
+    align-items: center;
+    gap: 0.8rem;
+    width: 100%;
+    margin-bottom: 1.5rem;
+  }
+
+  .footer-legal a {
+    font-size: 0.9rem;
+    padding: 0.4rem 0.8rem;
+  }
+
+  .copyright-notice {
+    font-size: 0.8rem;
+    margin-top: 1rem;
+    text-align: center;
+    width: 100%;
+  }
+
+  /* Other mobile adjustments */
+  .modal-overlay {
+    padding: 1rem;
+  }
+
+  .modal-content {
+    width: 95%;
+    max-width: 500px;
+    padding: 1.5rem 1rem;
+    max-height: 85vh;
+  }
+
+  .close-button {
+    font-size: 1.8rem;
+    right: 10px;
+    top: 10px;
+  }
+
+  .modal-title {
+    font-size: 1.8rem;
+    margin-bottom: 1rem;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+  }
+
+  .leaderboard-list,
+  .cosmeticos-list,
+  .personalizacion-list {
+    font-size: 0.9rem;
+  }
+
+  .leaderboard-item,
+  .cosmetico-item,
+  .personalizacion-item {
+    padding: 8px 12px;
+  }
+
+  .buy-button,
+  .select-button {
+    font-size: 0.8rem;
+    padding: 6px 10px;
+    margin: 8px 0;
+  }
+
+  .current-user-score {
+    margin-top: 15px;
+    font-size: 0.9rem;
+    padding-top: 10px;
+  }
+
+  .cosmeticos-list::-webkit-scrollbar,
+  .leaderboard-list::-webkit-scrollbar,
+  .personalizacion-list::-webkit-scrollbar {
+    width: 6px;
+  }
+
+  .cosmeticos-list::-webkit-scrollbar-thumb,
+  .leaderboard-list::-webkit-scrollbar-thumb,
+  .personalizacion-list::-webkit-scrollbar-thumb {
+    border-radius: 3px;
+  }
+
+  .mensaje-error {
+    margin: 8px 0;
+    padding: 8px;
+    font-size: 0.9rem;
+  }
+
+  .contact-page-container {
+    padding: 2rem 1rem;
+  }
+
+  .contact-content-wrapper {
+    flex-direction: column;
+    padding: 20px;
+    gap: 20px;
+  }
+
+  .contact-info-left,
+  .contact-form-right {
+    padding: 10px;
+    min-width: unset;
+    width: 100%;
+  }
+
+  .contact-info-left h2,
+  .contact-form-right h2 {
+    font-size: 1.8em;
+  }
+
+  .contact-info-left p {
+    font-size: 0.95em;
+  }
+
+  .contact-email {
+    font-size: 1.1em;
+    margin: 15px 0;
+  }
+
+  .contact-form label {
+    font-size: 0.9em;
+  }
+
+  .contact-form input[type="text"],
+  .contact-form input[type="email"],
+  .contact-form textarea {
+    padding: 10px;
+    font-size: 0.9em;
+  }
+
+  .contact-form textarea {
+    min-height: 100px;
+  }
+
+  .contact-form button {
+    padding: 10px 20px;
+    font-size: 1em;
+  }
+}

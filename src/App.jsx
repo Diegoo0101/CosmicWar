@@ -1,6 +1,5 @@
 import { BrowserRouter as Router, Routes, Route, Link } from 'react-router-dom';
 import './App.css';
-import './App_movil.css';
 import PhaserGame from './components/PhaserGame';
 import GoogleAuthButton from './components/GoogleAuthButton';
 import ComoJugar from './components/ComoJugar';
@@ -11,9 +10,9 @@ import ClasificacionModal from './components/ClasificacionModal';
 import TiendaModal from './components/TiendaModal';
 import PersonalizacionModal from './components/PersonalizacionModal';
 import { useState } from 'react';
-import twitterIcon from '/assets/twitter-icon.png';
-import facebookIcon from '/assets/facebook-icon.png';
-import instagramIcon from '/assets/instagram-icon.png';
+import twitterIcon from '/assets/iconos/twitter-icon.png';
+import facebookIcon from '/assets/iconos/facebook-icon.png';
+import instagramIcon from '/assets/iconos/instagram-icon.png';
 
 
 function App() {

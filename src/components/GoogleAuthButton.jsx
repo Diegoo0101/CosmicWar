@@ -3,7 +3,7 @@ import { GoogleAuthProvider, signInWithPopup, signOut, onAuthStateChanged } from
 import { auth } from '../firebase/config';
 import { getFirestore, doc, setDoc, getDoc, deleteDoc, collection, query, where, getDocs, writeBatch, onSnapshot } from 'firebase/firestore';
 const db = getFirestore();
-import googleIcon from '/assets/google-icon.png';
+import googleIcon from '/assets/iconos/google-icon.png';
   
 const GoogleAuthButton = () => {
   const [user, setUser] = useState(null);

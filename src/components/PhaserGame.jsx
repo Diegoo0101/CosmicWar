@@ -17,7 +17,7 @@ function PhaserGame() {
         container.style.justifyContent = 'center';
         container.style.height = '650px';
         container.style.backgroundColor = 'black';
-        container.innerHTML = '<h2 style="color: white; text-align: center;">Lo siento, el juego no está disponible en este dispositivo.</h2>';
+        container.innerHTML = '<h2 style="color: white; text-align: center;">Lo siento, CosmicWar no está disponible en este dispositivo.</h2>';
       }
     } else {
       const gameConfig = {
