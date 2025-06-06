@@ -48,7 +48,7 @@ p, li, span, button, a, div {
   text-shadow: 0 0 8px rgba(100, 255, 218, 0.4);
 }
 
-.navbar-title:hover, .contact-email:hover {
+.navbar-title:hover, .contact-email:hover, .footer-title:hover {
   color: #CCFFF3;
   text-shadow: 0 0 12px rgba(204, 255, 243, 0.6);
 }
@@ -129,6 +129,7 @@ p, li, span, button, a, div {
   text-decoration: none;
   margin-bottom: 1rem;
   white-space: nowrap;
+  transition: color 0.3s ease, text-shadow 0.3s ease;
 }
 
 .footer-links {
