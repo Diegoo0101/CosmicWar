@@ -269,11 +269,6 @@ p, li, span, button, a, div {
   border-radius: 10px;
   box-shadow: 0 0 12px rgba(100, 255, 218, 0.7);
   opacity: 0.7;
-  transition: opacity 0.3s ease-in-out;
-}
-
-.inner-column:hover {
-  opacity: 0.9;
 }
 
 .inner-column-thick {

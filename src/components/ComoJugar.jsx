@@ -2,13 +2,11 @@ import { Link } from 'react-router-dom';
 const ComoJugar = () => {
   return (
     <div className="como-jugar-layout">
-      {/* Columna izquierda */}
       <div className="column column-left">
         <div className="inner-column inner-column-thin"></div>
         <div className="inner-column inner-column-thick"></div>
       </div>
 
-      {/* Columna central */}
       <div className="column column-center">
         <div className="como-jugar-content">
           <h1>Cómo jugar</h1>
@@ -32,7 +30,6 @@ const ComoJugar = () => {
         </div>
       </div>
 
-      {/* Columna derecha */}
       <div className="column column-right">
         <div className="inner-column inner-column-thick"></div>
         <div className="inner-column inner-column-thin"></div>

@@ -34,7 +34,7 @@ const TiendaModal = ({ isOpen, onClose }) => {
       }
     };
 
-    // Obtiene todos los cosméticos de la colección
+    // Obtiene todos los cosméticos de la colección y los agrupa por tipos
     const obtenerCosmeticos = async () => {
       try {
         const querySnapshot = await getDocs(collection(db, 'cosmeticos'));
@@ -76,7 +76,6 @@ const TiendaModal = ({ isOpen, onClose }) => {
           where('usuario', '==', user.uid)
         );
         const adquisicionesSnapshot = await getDocs(adquisicionesQuery);
-        // Store the unique document IDs
         const adquiridos = adquisicionesSnapshot.docs.map(doc => doc.data().cosmetico.id);
 
         setAdquisiciones(adquiridos);
@@ -92,15 +91,15 @@ const TiendaModal = ({ isOpen, onClose }) => {
     }
   }, [isOpen]);
 
-  // Effect to manage the error message visibility and disappearance
+  // Muestra el mensaje de error durante 3 segundos y luego lo oculta
   useEffect(() => {
     if (mensajeError) {
       setMostrarMensajeError(true);
       const timer = setTimeout(() => {
         setMostrarMensajeError(false);
-        // After the transition, clear the message content
-        setTimeout(() => setMensajeError(''), 1000); // 1000ms matches the CSS transition duration
-      }, 3000); // Message visible for 3 seconds before fading
+        // Limpiar el mensaje
+        setTimeout(() => setMensajeError(''), 1000);
+      }, 3000);
       return () => clearTimeout(timer);
     }
   }, [mensajeError]);
@@ -113,11 +112,13 @@ const TiendaModal = ({ isOpen, onClose }) => {
   // Si el usuario compra un cosmético
   const comprar = async (item) => {
   try {
+    // No tiene suficientes monedas
     if (coinCont < item.precio) {
       setMensajeError('No tienes suficientes monedas para comprar este cosmético.');
-      return; // The useEffect will handle showing and hiding the message
+      return;
     }
 
+    // Se guarda el documento de adquisición en firestore
     await setDoc(
       doc(db, 'adquisiciones', `${user.uid}_${item.id}`),
       {
@@ -134,6 +135,7 @@ const TiendaModal = ({ isOpen, onClose }) => {
       { merge: true }
     );
 
+    // Resta las monedas del usuario
     const nuevasMonedas = coinCont - item.precio;
     await setDoc(
       doc(db, 'usuarios', user.uid),
@@ -143,8 +145,8 @@ const TiendaModal = ({ isOpen, onClose }) => {
 
     setCoinCont(nuevasMonedas);
     setAdquisiciones([...adquisiciones, item.id]);
-    setMensajeError(''); // Clear error on successful purchase
-    setMostrarMensajeError(false); // Hide the message immediately
+    setMensajeError('');
+    setMostrarMensajeError(false);
   } catch (error) {
     console.error('Error al realizar la compra:', error);
     setMensajeError('Ocurrió un error al procesar la compra.');
@@ -161,7 +163,6 @@ const TiendaModal = ({ isOpen, onClose }) => {
               Monedas: {coinCont}
             </div>
             <h2 className="modal-title">Tienda de Cosméticos</h2>
-            {/* Apply the class for transition */}
             <div className={`mensaje-error ${mostrarMensajeError ? 'show' : ''}`}>
               {mensajeError}
             </div>

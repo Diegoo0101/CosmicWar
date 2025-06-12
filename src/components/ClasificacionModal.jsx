@@ -19,7 +19,7 @@ const ClasificacionModal = ({ isOpen, onClose }) => {
           limit(10)
         );
         const querySnapshot = await getDocs(leaderboardQuery);
-
+        // Mapea los documentos a un formato más manejable
         const usersData = querySnapshot.docs.map(doc => ({
           id: doc.id,
           ...doc.data()

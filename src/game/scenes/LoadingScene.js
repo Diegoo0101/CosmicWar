@@ -12,6 +12,7 @@ export default class LoadingScene extends Phaser.Scene {
   
     try {
       const usuarioCargado = auth.currentUser;
+      // Si el usuario está autenticado, obtenemos los cosméticos seleccionados
       if (usuarioCargado) {
         const docSnapshot = await getDoc(doc(getFirestore(), 'usuarios', usuarioCargado.uid));
         if (docSnapshot.exists()) {
@@ -22,19 +23,18 @@ export default class LoadingScene extends Phaser.Scene {
         }
       }
   
-      // Si no se inicia sesión, los cosméticos son los predeterminados
+      // Si no está autenticado, los cosméticos son los predeterminados
       this.playerSkin = this.playerSkin || 'default';
       this.enemySkin = this.enemySkin || 'default';
       this.background = this.background || 'default';
     } catch (err) {
       console.error('Error al cargar desde Firestore:', err);
-      // Asignar cosméticos predeterminados en caso de error
       this.playerSkin = 'default';
       this.enemySkin = 'default';
       this.background = 'default';
     }
   
-    // Cargar recursos necesarios
+    // Cargar imagenes
     this.load.image('background', `/assets/Fondo/${this.background}.png`);
     this.load.image('player', `/assets/Jugador/${this.playerSkin}.png`);
     this.load.image('enemy', `/assets/Enemigo/${this.enemySkin}.png`);
@@ -49,13 +49,11 @@ export default class LoadingScene extends Phaser.Scene {
     this.load.image('coin', '/assets/sprites/coin.png');
     this.load.image('mute', '/assets/sprites/mute.png');
     this.load.image('unmute', '/assets/sprites/unmute.png');
-    
-  
     this.load.spritesheet('explosion', '/assets/sprites/explosion.png', {
       frameWidth: 256,
       frameHeight: 256,
     });
-
+    // Cargar audio
     this.load.audio('jefe_aparece', '/assets/audio/jefe.mp3');
     this.load.audio('disparo_jugador', '/assets/audio/disparo.mp3');
     this.load.audio('disparo', '/assets/audio/disparo2.mp3');
@@ -67,13 +65,12 @@ export default class LoadingScene extends Phaser.Scene {
     this.load.audio('explosion_jugador', '/assets/audio/explosion_jugador.mp3');
     this.load.audio('especial', '/assets/audio/especial.mp3');
     this.load.audio('explosion_jefe', 'assets/audio/explosion_jefe.wav');
-
     this.load.audio('oleada1-1', '/assets/audio/music/neonlight.m4a');
     this.load.audio('oleada1-2', '/assets/audio/music/overhaul.m4a');
     this.load.audio('oleada10', '/assets/audio/music/bluereflection.m4a');
     this.load.audio('oleada20', '/assets/audio/music/finalstrike.m4a');
   
-    // Espera a que todos los recursos se carguen antes de iniciar la siguiente escena
+    // Espera a que todos los recursos se carguen antes de iniciar el juego
     this.load.on('complete', () => {
       this.scene.start('GameScene');
     });

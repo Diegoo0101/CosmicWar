@@ -10,7 +10,7 @@ const Contacto = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [modalMessage, setModalMessage] = useState('');
   const [modalType, setModalType] = useState(''); 
-  
+  // URL para enviar los datos del formulario
   const FORMSPREE_ENDPOINT = 'https://formspree.io/f/xwpodgly';
 
   const handleChange = (e) => {
@@ -21,6 +21,7 @@ const Contacto = () => {
     e.preventDefault();
 
     try {
+      // Envia los datos del formulario en formato JSON para que sean validados
       const response = await fetch(FORMSPREE_ENDPOINT, {
         method: 'POST',
         headers: {
@@ -29,17 +30,18 @@ const Contacto = () => {
         },
         body: JSON.stringify(formData)
       });
-
+      // Si la validación es exitosa
       if (response.ok) {
         setModalMessage('¡Mensaje enviado con éxito!');
         setModalType('success');
         setIsModalOpen(true);
         setFormData({ name: '', email: '', message: '' }); 
       } else {
-        
+        // Si hay un error lee el cuerpo de la respuesta para obtener detalles
         const errorData = await response.json();
         let errorMessage = 'Ha ocurrido un error al enviar el mensaje. Por favor, inténtalo de nuevo.'; 
 
+        // Muestra los detalles del error traducidos
         if (errorData.errors && errorData.errors.length > 0) { 
           const translatedErrors = errorData.errors.map(err => { 
             switch (err.field) { 

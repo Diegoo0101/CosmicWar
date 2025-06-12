@@ -1,10 +1,11 @@
 import Phaser from 'phaser';
-
+// Clase que extiende de PostFXPipeline para efectos de post-procesamiento
 export default class GrayscalePipeline extends Phaser.Renderer.WebGL.Pipelines.PostFXPipeline {
   constructor(game) {
     super({
       game,
       name: 'GrayscalePipeline',
+      // Shader de fragmeento que se ejecuta sobre cada pixel, con efecto de escala de grises
       fragShader: `
         precision mediump float;
 

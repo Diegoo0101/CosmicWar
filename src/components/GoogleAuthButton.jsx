@@ -14,9 +14,10 @@ const GoogleAuthButton = () => {
     let unsubscribeUserData = null;
   
     const unsubscribeAuth = onAuthStateChanged(auth, async (currentUser) => {
-      // Comprueba si el usuario está autenticado
+      // Comprueba si el usuario está autenticado nada más cargar la página
       setUser(currentUser);
       if (currentUser) {
+        // Obtiene sus datos de firestore
         const userDocRef = doc(db, 'usuarios', currentUser.uid);
   
         unsubscribeUserData = onSnapshot(userDocRef, (docSnap) => {
@@ -42,13 +43,16 @@ const GoogleAuthButton = () => {
   const handleLogin = async () => {
     const provider = new GoogleAuthProvider();
     try {
+      // Ventana emergente para iniciar sesión
       const result = await signInWithPopup(auth, provider);
       const user = result.user;
+      // Obtiene el documento de firestore del usuario que ha iniciado sesión
       const userDocRef = doc(db, 'usuarios', user.uid);
       const userDocSnap = await getDoc(doc(db, 'usuarios', user.uid));
 
+      // Si no existe el documento
       if (!userDocSnap.exists()) {
-        // Solo se ejecuta si el usuario NO existía antes en la colección
+        // Crea un nuevo documento con datos del usuario y valores predeterminados
         await setDoc(userDocRef, {
           id: user.uid,
           nombre: user.displayName,
@@ -60,7 +64,8 @@ const GoogleAuthButton = () => {
           puntuacion: 0
         });
 
-        // Añade adquisiciones predeterminadas si el usuario es nuevo
+        // Añade como adquisiciones los cosméticos por defecto
+        // Cosmético por defecto del jugador
         const jugadorSnap = await getDoc(doc(db, 'cosmeticos', 'jugador_default'));
         if (jugadorSnap.exists()) {
           await setDoc(doc(db, 'adquisiciones', `${user.uid}_defaultJugador`), {
@@ -69,6 +74,7 @@ const GoogleAuthButton = () => {
             fecha: new Date().toISOString(),
           });
         }
+        // Cosmético por defecto del enemigo
         const enemigoSnap = await getDoc(doc(db, 'cosmeticos', 'enemigo_default'));
         if (enemigoSnap.exists()) {
           await setDoc(doc(db, 'adquisiciones', `${user.uid}_defaultEnemigo`), {
@@ -77,6 +83,7 @@ const GoogleAuthButton = () => {
             fecha: new Date().toISOString(),
           });
         }
+        // Cosmético por defecto del fondo
         const fondoSnap = await getDoc(doc(db, 'cosmeticos', 'fondo_default'));
         if (fondoSnap.exists()) {
           await setDoc(doc(db, 'adquisiciones', `${user.uid}_defaultFondo`), {
@@ -88,7 +95,6 @@ const GoogleAuthButton = () => {
       }
 
       window.location.reload();
-
     } catch (error) {
       console.error('Error al iniciar sesión:', error);
     }
@@ -108,22 +114,24 @@ const GoogleAuthButton = () => {
   const handleDeleteUser = async () => {
     if (user) {
       try {
+        // Recoge documento del usuario
         const userDocRef = doc(db, 'usuarios', user.uid);
   
-        // Eliminar todas las adquisiciones asociadas al usuario
+        // Recoge las adquisiciones relacionadas con el usuario
         const adquisicionesQuery = query(
           collection(db, 'adquisiciones'),
           where('usuario', '==', user.uid)
         );
         const adquisicionesSnapshot = await getDocs(adquisicionesQuery);
-  
+
+        // Elimina las adquisiciones del usuario
         const batch = writeBatch(db);
         adquisicionesSnapshot.forEach((doc) => {
           batch.delete(doc.ref);
         });
         await batch.commit();
   
-        // Eliminar el usuario
+        // Elimina el documento del usuario
         await deleteDoc(userDocRef);
         // Cierra sesión
         handleLogout();
@@ -134,8 +142,10 @@ const GoogleAuthButton = () => {
   };
 
   if (user) {
+    // Ha iniciado sesión
     return (
       <div className="user-info">
+        {/*Se muestra foto y nombre de usuario*/}
         <div
           className="user-header"
           onClick={() => setMenuVisible(!menuVisible)}
@@ -143,6 +153,7 @@ const GoogleAuthButton = () => {
           <img src={user.photoURL} alt="Foto de perfil" className="user-photo" referrerPolicy="no-referrer" />
           <span className="user-name">{user.displayName}</span>
         </div>
+        {/*Si se hace clic se abré el perfil, mostrando más información y botón de eliminar usuario*/}
         {menuVisible && (
           <div className="user-menu">
             <img src={user.photoURL} alt="Foto de perfil" className="user-photo-large" referrerPolicy="no-referrer" />
@@ -154,10 +165,12 @@ const GoogleAuthButton = () => {
             </button>
           </div>
         )}
+        {/*Botón de cerrar sesión*/}
         <button onClick={handleLogout} className="logout-button">✖</button>
       </div>
     );
   } else {
+    // No ha iniciado sesión, muestra el botón de Google
     return (
       <button onClick={handleLogin} className="googleBtn">
         <img src={googleIcon} alt="Google Logo" />

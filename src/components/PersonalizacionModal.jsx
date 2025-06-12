@@ -28,7 +28,7 @@ const PersonalizacionModal = ({ isOpen, onClose }) => {
           return;
         }
     
-        // Obtener selección actual
+        // Obtener qué cosméticos tiene el usuario seleccionados actualmente.
         const userDoc = await getDocs(query(collection(db, 'usuarios'), where('__name__', '==', user.uid)));
         const userData = userDoc.docs[0]?.data();
         setSeleccionActual({
@@ -37,19 +37,21 @@ const PersonalizacionModal = ({ isOpen, onClose }) => {
           Fondo: userData?.background_seleccionado || '',
         });
     
-        // Adquisiciones
+        // Obtiene todos las adquisiciones del usuario
         const adquisicionesQuery = query(
           collection(db, 'adquisiciones'),
           where('usuario', '==', user.uid)
         );
         const adquisicionesSnapshot = await getDocs(adquisicionesQuery);
+        // Obtiene todos los cosméticos de las adquisiciones del usuario
         const cosmeticosAdquiridos = adquisicionesSnapshot.docs.map(doc => doc.data().cosmetico);
-    
+        // Obtiene todos los cosméticos y los agrupa
         const cosmeticosSnapshot = await getDocs(collection(db, 'cosmeticos'));
         const todosLosCosmeticos = cosmeticosSnapshot.docs.map(doc => doc.data());
     
         const agrupados = { Jugador: [], Enemigo: [], Fondo: [] };
-    
+
+        // Agrupa los cosméticos por tipo y si fueron adquiridos por el usuario
         todosLosCosmeticos.forEach(item => {
           const tipo = item.tipo;
           if (agrupados[tipo] && cosmeticosAdquiridos.some(c => c.nombre === item.nombre && c.tipo === item.tipo)) {
@@ -84,7 +86,7 @@ const PersonalizacionModal = ({ isOpen, onClose }) => {
 
       setCosmeticoCambiado(true);
   
-      // Determinar el campo a actualizar según el tipo
+      // Determinar el campo a actualizar según el tipo de cosmético
       let campo;
       switch (item.tipo) {
         case 'Jugador':
@@ -105,7 +107,8 @@ const PersonalizacionModal = ({ isOpen, onClose }) => {
       await updateDoc(doc(db, 'usuarios', user.uid), {
         [campo]: item.imagen
       });
-  
+
+      // Actualiza la lista de cosméticos seleccionados para que se refleje en la UI
       setSeleccionActual(prev => ({
         ...prev,
         [item.tipo]: item.imagen
