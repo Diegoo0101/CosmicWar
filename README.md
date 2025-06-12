@@ -19,9 +19,6 @@ El juego incluye:
 Juega en línea:  
 🔗 [https://cosmic-war-7b420.web.app](https://cosmic-war-7b420.web.app)
 
-Repositorio en GitHub:  
-🔗 [https://github.com/Diegoo0101/CosmicWar](https://github.com/Diegoo0101/CosmicWar)
-
 ## 🛠️ Tecnologías
 
 - **Frontend**: React, CSS3, Vite
@@ -86,9 +83,9 @@ Algunas acciones disponibles para los usuarios autenticados:
 
 ```
 /public/assets        # Recursos gráficos del juego
-/game                 # Lógica Phaser (escenas, shaders, configuraciones)
-/components           # Componentes React (UI, tienda, contacto, etc.)
-/firebase             # Configuración Firebase
+/src/game             # Lógica Phaser (escenas, shaders, configuraciones)
+/src/components       # Componentes React (UI, tienda, contacto, etc.)
+/src/firebase         # Configuración Firebase
 App.jsx               # Componente principal
 main.jsx              # Entrada del proyecto
 ```
@@ -108,19 +105,10 @@ El juego ha sido probado exhaustivamente, cubriendo más de 50 casos de uso:
 - Chat global entre jugadores
 - Nuevos tipos de enemigos y jefes
 - Contenidos exclusivos con microtransacciones
-- Funcionalidades sociales (ranking de amigos, logros, etc.)
-
-## 📚 Créditos y recursos
-
-Consulta la [documentación completa del proyecto](https://github.com/Diegoo0101/CosmicWar) para conocer:
-
-- Bitácora de desarrollo
-- Manual de usuario detallado
-- Bibliografía y recursos de sprites, sonido y música
 
 ## 🧑‍💻 Autor
 
-Desarrollado por **Diego Tejero Giménez**  
+Desarrollado por **CosmicWar Team**  
 📧 [cosmicwar.team@gmail.com](mailto:cosmicwar.team@gmail.com)
 
 ---
