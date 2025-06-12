@@ -6,6 +6,7 @@ import GrayscalePipeline from '../GrayscalePipeline';
 const db = getFirestore();
 
 export default class GameScene extends Phaser.Scene {
+  // Se inicializan las propiedades de la clase
   constructor() {
     super('GameScene');
     // Vida del jugador
@@ -58,6 +59,7 @@ export default class GameScene extends Phaser.Scene {
     this.bossAngleOffset = 0;
   }
 
+  // Inicializa y coloca todos los objetos del juego, configura controles, etc.
   create() {
     // Pipeline con filtro blanco y negro
     this.renderer.pipelines.addPostPipeline('GrayscalePipeline', GrayscalePipeline);
@@ -176,6 +178,7 @@ export default class GameScene extends Phaser.Scene {
     this.startWave();
   }
 
+  // Actualiza la lógica del juego en cada frame
   update(time) {
     // Controles de movimiento
     // Izquierda y derecha

@@ -5,7 +5,7 @@ export default class GrayscalePipeline extends Phaser.Renderer.WebGL.Pipelines.P
     super({
       game,
       name: 'GrayscalePipeline',
-      // Shader de fragmeento que se ejecuta sobre cada pixel, con efecto de escala de grises
+      // Shader de fragmento que se ejecuta sobre cada pixel, con filtro de escala de grises
       fragShader: `
         precision mediump float;
 
